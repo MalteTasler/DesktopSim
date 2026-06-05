@@ -105,7 +105,7 @@ const DesktopWindow: FC<DesktopWindowProps> = ({
       </div>
       <div className="window__body">
         <WindowContent
-          appId={window.id}
+          app={window}
           settings={settings}
           onSettingsChange={onSettingsChange}
           explorer={explorer}

@@ -1,11 +1,12 @@
 import { Dispatch, FC, SetStateAction } from "react";
-import { DesktopSettings, ExplorerItem, ExplorerState } from "../types";
+import { DesktopApp, DesktopSettings, ExplorerItem, ExplorerState } from "../types";
+import BrowserPane from "./BrowserPane";
 import ExplorerPane from "./ExplorerPane";
 import SettingsPane from "./SettingsPane";
 import TerminalPane from "./TerminalPane";
 
 type WindowContentProps = {
-  appId: string;
+  app: DesktopApp;
   settings: DesktopSettings;
   onSettingsChange: Dispatch<SetStateAction<DesktopSettings>>;
   explorer: ExplorerState;
@@ -18,7 +19,7 @@ type WindowContentProps = {
 };
 
 const WindowContent: FC<WindowContentProps> = ({
-  appId,
+  app,
   settings,
   onSettingsChange,
   explorer,
@@ -29,11 +30,19 @@ const WindowContent: FC<WindowContentProps> = ({
   onExplorerSelect,
   onExplorerOpen,
 }) => {
-  if (appId === "terminal") {
+  if (app.kind === "web" && app.url) {
+    return <BrowserPane fixedTitle={app.title} fixedUrl={app.url} />;
+  }
+
+  if (app.id === "browser") {
+    return <BrowserPane />;
+  }
+
+  if (app.id === "terminal") {
     return <TerminalPane />;
   }
 
-  if (appId === "files") {
+  if (app.id === "files") {
     return (
       <ExplorerPane
         state={explorer}

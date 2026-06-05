@@ -197,8 +197,18 @@ export function useDesktopController() {
         windowId,
         x: 190 + offset,
         y: 80 + offset,
-        width: app.id === "terminal" ? 640 : 520,
-        height: app.id === "terminal" ? 390 : 340,
+        width:
+          app.kind === "web" || app.id === "browser"
+            ? 820
+            : app.id === "terminal"
+              ? 640
+              : 520,
+        height:
+          app.kind === "web" || app.id === "browser"
+            ? 560
+            : app.id === "terminal"
+              ? 390
+              : 340,
         zIndex,
         minimized: false,
         maximized: false,

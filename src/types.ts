@@ -1,7 +1,28 @@
+export type DesktopAppIcon =
+  | "browser"
+  | "calendar"
+  | "chat"
+  | "folder"
+  | "mail"
+  | "map"
+  | "music"
+  | "settings"
+  | "shopping"
+  | "terminal"
+  | "video";
+
 export type DesktopApp = {
   id: string;
   title: string;
-  icon: "folder" | "terminal" | "settings";
+  icon: DesktopAppIcon;
+  kind?: "native" | "web";
+  url?: string;
+};
+
+export type WebAppDefinition = {
+  title: string;
+  icon: DesktopAppIcon;
+  url: string;
 };
 
 export type DesktopIcon = DesktopApp & {

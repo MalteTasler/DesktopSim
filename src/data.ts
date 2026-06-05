@@ -1,4 +1,4 @@
-import { DesktopApp, DesktopIcon, ExplorerItem } from "./types";
+import { DesktopApp, DesktopIcon, ExplorerItem, WebAppDefinition } from "./types";
 
 export const accentColors = ["#2563eb", "#0f766e", "#a16207", "#be123c"];
 
@@ -166,14 +166,42 @@ export const fileSystem: Record<string, ExplorerItem[]> = {
   "Desktop/Projects/Archive": [],
 };
 
-export const apps: DesktopApp[] = [
+export const nativeApps: DesktopApp[] = [
+  { id: "browser", title: "Browser", icon: "browser" },
   { id: "files", title: "Explorer", icon: "folder" },
   { id: "terminal", title: "Terminal", icon: "terminal" },
   { id: "settings", title: "Settings", icon: "settings" },
 ];
 
+// Add web apps here with only title, icon, and url.
+export const webApps: WebAppDefinition[] = [
+  { title: "Example", icon: "browser", url: "https://example.com" },
+  { title: "Tobit", icon: "shopping", url: "https://tobit.com?fullscreen=6" },
+];
+
+function createWebAppId(title: string, index: number) {
+  const slug = title
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return `web-${slug || index + 1}`;
+}
+
+export const apps: DesktopApp[] = [
+  ...nativeApps.map((app) => ({ ...app, kind: "native" as const })),
+  ...webApps.map((app, index) => ({
+    ...app,
+    id: createWebAppId(app.title, index),
+    kind: "web" as const,
+  })),
+];
+
 export const initialIcons: DesktopIcon[] = [
-  { ...apps[0], x: 32, y: 34 },
-  { ...apps[1], x: 32, y: 130 },
-  { ...apps[2], x: 32, y: 226 },
+  ...apps.map((app, index) => ({
+    ...app,
+    x: 32,
+    y: 34 + index * 96,
+  })),
 ];
