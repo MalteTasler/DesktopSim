@@ -10,6 +10,7 @@ type TaskbarProps = {
   actionCenterOpen: boolean;
   children: ReactNode;
   onOpenApp: (app: DesktopApp) => void;
+  onAppContextMenu: (event: MouseEvent<HTMLButtonElement>, app: DesktopApp) => void;
   onStartToggle: (event: MouseEvent<HTMLButtonElement>) => void;
   onActionCenterToggle: (event: MouseEvent<HTMLButtonElement>) => void;
 };
@@ -21,6 +22,7 @@ const Taskbar: FC<TaskbarProps> = ({
   actionCenterOpen,
   children,
   onOpenApp,
+  onAppContextMenu,
   onStartToggle,
   onActionCenterToggle,
 }) => (
@@ -44,6 +46,7 @@ const Taskbar: FC<TaskbarProps> = ({
             aria-label={app.title}
             title={app.title}
             onClick={() => onOpenApp(app)}
+            onContextMenu={(event) => onAppContextMenu(event, app)}
           >
             <Icon size={20} />
           </button>

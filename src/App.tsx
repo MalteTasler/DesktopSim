@@ -21,6 +21,7 @@ const App: FC = () => {
       }`}
       style={desktop.desktopStyle}
       onClick={() => {
+        desktop.setSelectedIcon(null);
         desktop.setContextMenu(null);
         desktop.setStartOpen(false);
         desktop.setActionCenterOpen(false);
@@ -92,13 +93,20 @@ const App: FC = () => {
       )}
 
       <footer className="desktop__taskbar">
-        {desktop.startOpen && <StartMenu apps={apps} onOpenApp={desktop.openApp} />}
+        {desktop.startOpen && (
+          <StartMenu
+            apps={apps}
+            onOpenApp={desktop.openApp}
+            onAppContextMenu={desktop.showIconMenu}
+          />
+        )}
         <Taskbar
-          apps={apps}
+          apps={desktop.taskbarApps}
           windows={desktop.windows}
           time={desktop.clock}
           actionCenterOpen={desktop.actionCenterOpen}
           onOpenApp={desktop.openApp}
+          onAppContextMenu={desktop.showTaskbarAppMenu}
           onStartToggle={(event) => {
             event.stopPropagation();
             desktop.setStartOpen((current) => !current);

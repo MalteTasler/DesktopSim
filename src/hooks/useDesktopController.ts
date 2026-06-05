@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { accentColors, fileSystem, initialIcons } from "../data";
+import { accentColors, apps, fileSystem, initialIcons } from "../data";
 import {
   ActionCenterState,
   ContextMenuState,
@@ -87,6 +87,9 @@ function getSnapBounds(pointerX: number, pointerY: number): WindowBounds | null 
 export function useDesktopController() {
   const [icons, setIcons] = useState(initialIcons);
   const [windows, setWindows] = useState<SimWindow[]>([]);
+  const [pinnedTaskbarApps, setPinnedTaskbarApps] = useState<string[]>(() =>
+    apps.map((app) => app.id),
+  );
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [activeWindow, setActiveWindow] = useState<string | null>(null);
@@ -126,6 +129,15 @@ export function useDesktopController() {
   const visibleWindows = useMemo(
     () => windows.filter((windowState) => !windowState.minimized),
     [windows],
+  );
+  const taskbarApps = useMemo(
+    () =>
+      apps.filter(
+        (app) =>
+          pinnedTaskbarApps.includes(app.id) ||
+          windows.some((windowState) => windowState.id === app.id),
+      ),
+    [pinnedTaskbarApps, windows],
   );
 
   const desktopStyle = {
@@ -243,25 +255,118 @@ export function useDesktopController() {
     focusWindow(windowId);
   }
 
+  function sortDesktopIcons(sortBy: "name" | "type") {
+    setIcons((current) => {
+      const sorted = [...current].sort((left, right) => {
+        if (sortBy === "type") {
+          const typeComparison = left.icon.localeCompare(right.icon);
+
+          if (typeComparison !== 0) {
+            return typeComparison;
+          }
+        }
+
+        return left.title.localeCompare(right.title);
+      });
+
+      return sorted.map((icon, index) => ({
+        ...icon,
+        x: 32,
+        y: 34 + index * 96,
+      }));
+    });
+    setSelectedIcon(null);
+  }
+
+  function openDisplaySettings() {
+    const settingsApp = apps.find((app) => app.id === "settings");
+
+    if (settingsApp) {
+      openApp(settingsApp);
+    }
+  }
+
+  function toggleTaskbarPin(appId: string) {
+    setPinnedTaskbarApps((current) =>
+      current.includes(appId)
+        ? current.filter((pinnedAppId) => pinnedAppId !== appId)
+        : [...current, appId],
+    );
+  }
+
+  function showAppMenu(
+    event: MouseEvent,
+    app: DesktopApp,
+    options: { includeWindowActions?: boolean } = {},
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const appWindow = windows.find((windowState) => windowState.id === app.id);
+    const isPinned = pinnedTaskbarApps.includes(app.id);
+
+    setSelectedIcon(app.id);
+    setContextMenu({
+      x: event.clientX,
+      y: event.clientY,
+      items: [
+        { label: "Open", onSelect: () => openApp(app) },
+        {
+          label: isPinned ? "Unpin from taskbar" : "Pin to taskbar",
+          onSelect: () => toggleTaskbarPin(app.id),
+        },
+        ...(options.includeWindowActions && appWindow
+          ? [
+              {
+                label: "Minimize",
+                onSelect: () => minimizeWindow(appWindow.windowId),
+              },
+              {
+                label: appWindow.maximized ? "Restore" : "Maximize",
+                onSelect: () => toggleMaximize(appWindow.windowId),
+              },
+              {
+                label: "Close",
+                onSelect: () => closeWindow(appWindow.windowId),
+              },
+            ]
+          : []),
+      ],
+    });
+  }
+
   function showDesktopMenu(event: MouseEvent) {
     event.preventDefault();
+    const target = event.target;
+
+    if (
+      !(target instanceof Element) ||
+      target.closest(
+        ".window, .desktop-icon, .desktop__taskbar, .start-menu, .action-center, .context-menu",
+      )
+    ) {
+      return;
+    }
+
+    event.stopPropagation();
     setSelectedIcon(null);
     setContextMenu({
       x: event.clientX,
       y: event.clientY,
-      items: ["View", "Sort by", "Refresh", "New folder", "Display settings"],
+      items: [
+        { label: "Sort by name", onSelect: () => sortDesktopIcons("name") },
+        { label: "Sort by type", onSelect: () => sortDesktopIcons("type") },
+        { label: "Display settings", onSelect: openDisplaySettings },
+      ],
     });
   }
 
-  function showIconMenu(event: MouseEvent, icon: DesktopIcon) {
-    event.preventDefault();
-    event.stopPropagation();
-    setSelectedIcon(icon.id);
-    setContextMenu({
-      x: event.clientX,
-      y: event.clientY,
-      items: ["Open", "Pin to taskbar", "Rename", "Properties"],
-    });
+  function showIconMenu(event: MouseEvent, icon: DesktopApp) {
+    showAppMenu(event, icon);
+  }
+
+  function showTaskbarAppMenu(event: MouseEvent, app: DesktopApp) {
+    showAppMenu(event, app, { includeWindowActions: true });
   }
 
   function dragIcon(event: PointerEvent<HTMLButtonElement>, iconId: string) {
@@ -586,6 +691,7 @@ export function useDesktopController() {
     settings,
     snapPreview,
     startOpen,
+    taskbarApps,
     visibleWindows,
     windows,
     closeWindow,
@@ -603,10 +709,12 @@ export function useDesktopController() {
     setActionCenterOpen,
     setContextMenu,
     setSettings,
+    setSelectedIcon,
     setStartOpen,
     selectDesktopIcon,
     showDesktopMenu,
     showIconMenu,
+    showTaskbarAppMenu,
     toggleMaximize,
     navigateExplorer,
     resizeWindow,

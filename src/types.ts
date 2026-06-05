@@ -31,10 +31,15 @@ export type ResizeDirection =
   | "sw"
   | "nw";
 
+export type ContextMenuItem = {
+  label: string;
+  onSelect?: () => void;
+};
+
 export type ContextMenuState = {
   x: number;
   y: number;
-  items: string[];
+  items: ContextMenuItem[];
 };
 
 export type DesktopSettings = {

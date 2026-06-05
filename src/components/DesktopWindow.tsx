@@ -75,6 +75,7 @@ const DesktopWindow: FC<DesktopWindowProps> = ({
         zIndex: window.zIndex,
       }}
       onPointerDown={onFocus}
+      onContextMenu={(event) => event.stopPropagation()}
       aria-label={window.title}
     >
       <div className="window__titlebar" onPointerDown={onDrag} onDoubleClick={onMaximize}>
