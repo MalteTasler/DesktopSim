@@ -1,4 +1,3 @@
-import { Power } from "lucide-react";
 import { FC, MouseEvent } from "react";
 import { DesktopApp } from "../types";
 import { iconMap } from "../utils/iconMap";
@@ -14,9 +13,6 @@ const StartMenu: FC<StartMenuProps> = ({ apps, onOpenApp, onAppContextMenu }) =>
     <div onClick={(event) => event.stopPropagation()}>
       <div className="start-menu__header">
         <span>DesktopSim</span>
-        <button aria-label="Power options" title="Power options">
-          <Power size={16} />
-        </button>
       </div>
       <div className="start-menu__grid">
         {apps.map((app) => {

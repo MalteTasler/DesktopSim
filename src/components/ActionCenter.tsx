@@ -1,4 +1,14 @@
-import { Battery, Bell, Bluetooth, Moon, Sun, Volume2, Wifi, X } from "lucide-react";
+import {
+  Battery,
+  Bell,
+  Bluetooth,
+  Moon,
+  Power,
+  Sun,
+  Volume2,
+  Wifi,
+  X,
+} from "lucide-react";
 import { Dispatch, FC, SetStateAction } from "react";
 import { ActionCenterState } from "../types";
 
@@ -6,9 +16,10 @@ type ActionCenterProps = {
   state: ActionCenterState;
   onChange: Dispatch<SetStateAction<ActionCenterState>>;
   onClose: () => void;
+  onPower: () => void;
 };
 
-const ActionCenter: FC<ActionCenterProps> = ({ state, onChange, onClose }) => {
+const ActionCenter: FC<ActionCenterProps> = ({ state, onChange, onClose, onPower }) => {
   function toggle(
     key: keyof Pick<
       ActionCenterState,
@@ -29,9 +40,6 @@ const ActionCenter: FC<ActionCenterProps> = ({ state, onChange, onClose }) => {
           <strong>Action Center</strong>
           <span>{state.wifi ? "Connected" : "Offline"}</span>
         </div>
-        <button aria-label="Close action center" title="Close" onClick={onClose}>
-          <X size={16} />
-        </button>
       </div>
       <div className="action-center__quick-actions">
         <button
@@ -100,8 +108,15 @@ const ActionCenter: FC<ActionCenterProps> = ({ state, onChange, onClose }) => {
         <span>{state.brightness}%</span>
       </label>
       <div className="action-center__footer">
+        <button
+          className="action-center__power-button"
+          aria-label="Reset desktop"
+          title="Reset desktop"
+          onClick={onPower}
+        >
+          <Power size={16} />
+        </button>
         <span>Battery 83%</span>
-        <span>{state.bluetooth ? "Bluetooth on" : "Bluetooth off"}</span>
       </div>
       {state.focusAssist && (
         <div className="action-center__notification">

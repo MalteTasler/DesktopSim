@@ -28,6 +28,30 @@ const SNAP_THRESHOLD = 24;
 
 type WindowBounds = Pick<SimWindow, "x" | "y" | "width" | "height">;
 
+const initialSettings: DesktopSettings = {
+  theme: "light",
+  transparency: true,
+  snapWindows: true,
+  accentIntensity: 65,
+  accentColor: accentColors[1],
+};
+
+const initialExplorer: ExplorerState = {
+  path: "Desktop",
+  history: [],
+  future: [],
+  selectedId: null,
+};
+
+const initialActionCenter: ActionCenterState = {
+  wifi: true,
+  bluetooth: false,
+  batterySaver: false,
+  focusAssist: false,
+  volume: 62,
+  brightness: 74,
+};
+
 function getWorkArea() {
   return {
     width: globalThis.window.innerWidth,
@@ -97,27 +121,10 @@ export function useDesktopController() {
   const [startOpen, setStartOpen] = useState(false);
   const [actionCenterOpen, setActionCenterOpen] = useState(false);
   const [clock, setClock] = useState(() => new Date());
-  const [settings, setSettings] = useState<DesktopSettings>({
-    theme: "light",
-    transparency: true,
-    snapWindows: true,
-    accentIntensity: 65,
-    accentColor: accentColors[1],
-  });
-  const [explorer, setExplorer] = useState<ExplorerState>({
-    path: "Desktop",
-    history: [],
-    future: [],
-    selectedId: null,
-  });
-  const [actionCenter, setActionCenter] = useState<ActionCenterState>({
-    wifi: true,
-    bluetooth: false,
-    batterySaver: false,
-    focusAssist: false,
-    volume: 62,
-    brightness: 74,
-  });
+  const [settings, setSettings] = useState<DesktopSettings>(initialSettings);
+  const [explorer, setExplorer] = useState<ExplorerState>(initialExplorer);
+  const [actionCenter, setActionCenter] =
+    useState<ActionCenterState>(initialActionCenter);
   const zCounter = useRef(10);
 
   useEffect(() => {
@@ -678,6 +685,22 @@ export function useDesktopController() {
     selectExplorerItem(item.id);
   }
 
+  function resetDesktop() {
+    setIcons(initialIcons);
+    setWindows([]);
+    setPinnedTaskbarApps(apps.map((app) => app.id));
+    setContextMenu(null);
+    setSelectedIcon(null);
+    setActiveWindow(null);
+    setSnapPreview(null);
+    setStartOpen(false);
+    setActionCenterOpen(false);
+    setSettings(initialSettings);
+    setExplorer(initialExplorer);
+    setActionCenter(initialActionCenter);
+    zCounter.current = 10;
+  }
+
   return {
     actionCenter,
     actionCenterOpen,
@@ -718,5 +741,6 @@ export function useDesktopController() {
     toggleMaximize,
     navigateExplorer,
     resizeWindow,
+    resetDesktop,
   };
 }

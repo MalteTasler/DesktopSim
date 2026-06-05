@@ -124,6 +124,7 @@ const App: FC = () => {
               state={desktop.actionCenter}
               onChange={desktop.setActionCenter}
               onClose={() => desktop.setActionCenterOpen(false)}
+              onPower={desktop.resetDesktop}
             />
           )}
         </Taskbar>

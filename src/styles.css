@@ -931,6 +931,21 @@ button {
   color: inherit;
 }
 
+.action-center__power-button {
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  color: #334155;
+}
+
+.desktop--dark .action-center__power-button {
+  color: #e5edf7;
+}
+
+.action-center__power-button:hover {
+  background: var(--accent-soft);
+}
+
 .action-center__quick-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
