@@ -32,6 +32,18 @@ const App: FC = () => {
         <CloudSun size={18} />
         <span>18 deg</span>
       </div>
+      {desktop.snapPreview && (
+        <div
+          className="desktop__snap-preview"
+          style={{
+            left: desktop.snapPreview.x,
+            top: desktop.snapPreview.y,
+            width: desktop.snapPreview.width,
+            height: desktop.snapPreview.height,
+          }}
+          aria-hidden="true"
+        />
+      )}
 
       <section className="desktop__icon-layer" aria-label="Desktop icons">
         {desktop.icons.map((icon) => (
@@ -57,6 +69,9 @@ const App: FC = () => {
           onMaximize={() => desktop.toggleMaximize(windowState.windowId)}
           onFocus={() => desktop.focusWindow(windowState.windowId)}
           onDrag={(event) => desktop.dragWindow(event, windowState.windowId)}
+          onResize={(event, direction) =>
+            desktop.resizeWindow(event, windowState.windowId, direction)
+          }
           settings={desktop.settings}
           onSettingsChange={desktop.setSettings}
           explorer={desktop.explorer}

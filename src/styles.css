@@ -80,6 +80,18 @@ button {
   backdrop-filter: blur(16px);
 }
 
+.desktop__snap-preview {
+  position: absolute;
+  z-index: 9;
+  border: 2px solid color-mix(in srgb, var(--accent-color), #ffffff 28%);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent-color), transparent 72%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.36),
+    0 0 0 1px rgba(15, 23, 42, 0.14);
+  pointer-events: none;
+}
+
 .desktop-icon {
   position: absolute;
   display: grid;
@@ -222,6 +234,76 @@ button {
 .window__body {
   min-height: 0;
   overflow: hidden;
+}
+
+.window__resize-handle {
+  position: absolute;
+  z-index: 2;
+  touch-action: none;
+}
+
+.window__resize-handle--n,
+.window__resize-handle--s {
+  right: 8px;
+  left: 8px;
+  height: 8px;
+  cursor: ns-resize;
+}
+
+.window__resize-handle--n {
+  top: -4px;
+}
+
+.window__resize-handle--s {
+  bottom: -4px;
+}
+
+.window__resize-handle--e,
+.window__resize-handle--w {
+  top: 8px;
+  bottom: 8px;
+  width: 8px;
+  cursor: ew-resize;
+}
+
+.window__resize-handle--e {
+  right: -4px;
+}
+
+.window__resize-handle--w {
+  left: -4px;
+}
+
+.window__resize-handle--ne,
+.window__resize-handle--se,
+.window__resize-handle--sw,
+.window__resize-handle--nw {
+  width: 14px;
+  height: 14px;
+}
+
+.window__resize-handle--ne {
+  top: -5px;
+  right: -5px;
+  cursor: nesw-resize;
+}
+
+.window__resize-handle--se {
+  right: -5px;
+  bottom: -5px;
+  cursor: nwse-resize;
+}
+
+.window__resize-handle--sw {
+  bottom: -5px;
+  left: -5px;
+  cursor: nesw-resize;
+}
+
+.window__resize-handle--nw {
+  top: -5px;
+  left: -5px;
+  cursor: nwse-resize;
 }
 
 .terminal-pane {

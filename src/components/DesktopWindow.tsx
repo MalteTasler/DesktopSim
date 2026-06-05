@@ -1,6 +1,12 @@
 import { Minus, Square, X } from "lucide-react";
 import { Dispatch, FC, PointerEvent, SetStateAction } from "react";
-import { DesktopSettings, ExplorerItem, ExplorerState, SimWindow } from "../types";
+import {
+  DesktopSettings,
+  ExplorerItem,
+  ExplorerState,
+  ResizeDirection,
+  SimWindow,
+} from "../types";
 import { iconMap } from "../utils/iconMap";
 import WindowContent from "./WindowContent";
 
@@ -12,6 +18,10 @@ type DesktopWindowProps = {
   onMaximize: () => void;
   onFocus: () => void;
   onDrag: (event: PointerEvent<HTMLDivElement>) => void;
+  onResize: (
+    event: PointerEvent<HTMLDivElement>,
+    direction: ResizeDirection,
+  ) => void;
   settings: DesktopSettings;
   onSettingsChange: Dispatch<SetStateAction<DesktopSettings>>;
   explorer: ExplorerState;
@@ -31,6 +41,7 @@ const DesktopWindow: FC<DesktopWindowProps> = ({
   onMaximize,
   onFocus,
   onDrag,
+  onResize,
   settings,
   onSettingsChange,
   explorer,
@@ -42,6 +53,16 @@ const DesktopWindow: FC<DesktopWindowProps> = ({
   onExplorerOpen,
 }) => {
   const Icon = iconMap[window.icon];
+  const resizeDirections: ResizeDirection[] = [
+    "n",
+    "e",
+    "s",
+    "w",
+    "ne",
+    "se",
+    "sw",
+    "nw",
+  ];
 
   return (
     <section
@@ -95,6 +116,15 @@ const DesktopWindow: FC<DesktopWindowProps> = ({
           onExplorerOpen={onExplorerOpen}
         />
       </div>
+      {!window.maximized &&
+        resizeDirections.map((direction) => (
+          <div
+            key={direction}
+            className={`window__resize-handle window__resize-handle--${direction}`}
+            onPointerDown={(event) => onResize(event, direction)}
+            aria-hidden="true"
+          />
+        ))}
     </section>
   );
 };

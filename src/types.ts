@@ -21,6 +21,16 @@ export type SimWindow = DesktopApp & {
   maximized: boolean;
 };
 
+export type ResizeDirection =
+  | "n"
+  | "e"
+  | "s"
+  | "w"
+  | "ne"
+  | "se"
+  | "sw"
+  | "nw";
+
 export type ContextMenuState = {
   x: number;
   y: number;

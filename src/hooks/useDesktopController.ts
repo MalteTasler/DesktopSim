@@ -16,9 +16,73 @@ import {
   DesktopSettings,
   ExplorerItem,
   ExplorerState,
+  ResizeDirection,
   SimWindow,
 } from "../types";
 import { formatTime } from "../utils/formatTime";
+
+const MIN_WINDOW_WIDTH = 340;
+const MIN_WINDOW_HEIGHT = 230;
+const TASKBAR_HEIGHT = 48;
+const SNAP_THRESHOLD = 24;
+
+type WindowBounds = Pick<SimWindow, "x" | "y" | "width" | "height">;
+
+function getWorkArea() {
+  return {
+    width: globalThis.window.innerWidth,
+    height: globalThis.window.innerHeight - TASKBAR_HEIGHT,
+  };
+}
+
+function getSnapBounds(pointerX: number, pointerY: number): WindowBounds | null {
+  const { width, height } = getWorkArea();
+  const nearLeft = pointerX <= SNAP_THRESHOLD;
+  const nearRight = width - pointerX <= SNAP_THRESHOLD;
+  const nearTop = pointerY <= SNAP_THRESHOLD;
+  const nearBottom = height - pointerY <= SNAP_THRESHOLD;
+  const halfWidth = Math.max(MIN_WINDOW_WIDTH, width / 2);
+  const halfHeight = Math.max(MIN_WINDOW_HEIGHT, height / 2);
+
+  if (nearLeft && nearTop) {
+    return { x: 0, y: 0, width: halfWidth, height: halfHeight };
+  }
+
+  if (nearRight && nearTop) {
+    return { x: width - halfWidth, y: 0, width: halfWidth, height: halfHeight };
+  }
+
+  if (nearRight && nearBottom) {
+    return {
+      x: width - halfWidth,
+      y: height - halfHeight,
+      width: halfWidth,
+      height: halfHeight,
+    };
+  }
+
+  if (nearLeft && nearBottom) {
+    return { x: 0, y: height - halfHeight, width: halfWidth, height: halfHeight };
+  }
+
+  if (nearLeft) {
+    return { x: 0, y: 0, width: halfWidth, height };
+  }
+
+  if (nearRight) {
+    return { x: width - halfWidth, y: 0, width: halfWidth, height };
+  }
+
+  if (nearTop) {
+    return { x: 0, y: 0, width, height: halfHeight };
+  }
+
+  if (nearBottom) {
+    return { x: 0, y: height - halfHeight, width, height: halfHeight };
+  }
+
+  return null;
+}
 
 export function useDesktopController() {
   const [icons, setIcons] = useState(initialIcons);
@@ -26,6 +90,7 @@ export function useDesktopController() {
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [activeWindow, setActiveWindow] = useState<string | null>(null);
+  const [snapPreview, setSnapPreview] = useState<WindowBounds | null>(null);
   const [startOpen, setStartOpen] = useState(false);
   const [actionCenterOpen, setActionCenterOpen] = useState(false);
   const [clock, setClock] = useState(() => new Date());
@@ -169,8 +234,8 @@ export function useDesktopController() {
           },
           x: 8,
           y: 8,
-          width: Math.max(320, globalThis.window.innerWidth - 16),
-          height: Math.max(260, globalThis.window.innerHeight - 64),
+          width: Math.max(MIN_WINDOW_WIDTH, globalThis.window.innerWidth - 16),
+          height: Math.max(MIN_WINDOW_HEIGHT, globalThis.window.innerHeight - 64),
           maximized: true,
         };
       }),
@@ -254,38 +319,171 @@ export function useDesktopController() {
 
     const baseX = windowState.x;
     const baseY = windowState.y;
-    const baseWidth = windowState.width;
+    const restoreBounds = windowState.previousBounds;
+    const dragWidth = restoreBounds?.width ?? windowState.width;
+    const dragHeight = restoreBounds?.height ?? windowState.height;
+    const pointerRatioX = restoreBounds
+      ? Math.min(Math.max((startX - baseX) / windowState.width, 0.12), 0.88)
+      : 0;
+    const pointerOffsetY = restoreBounds
+      ? Math.min(Math.max(startY - baseY, 8), 32)
+      : 0;
 
     target.setPointerCapture(event.pointerId);
     focusWindow(windowId);
 
     function onPointerMove(moveEvent: globalThis.PointerEvent) {
-      let nextX = Math.min(
-        Math.max(0, baseX + moveEvent.clientX - startX),
+      const previewBounds = settings.snapWindows
+        ? getSnapBounds(moveEvent.clientX, moveEvent.clientY)
+        : null;
+      const nextX = Math.min(
+        Math.max(
+          0,
+          restoreBounds
+            ? moveEvent.clientX - dragWidth * pointerRatioX
+            : baseX + moveEvent.clientX - startX,
+        ),
         window.innerWidth - 96,
       );
-      let nextY = Math.min(
-        Math.max(0, baseY + moveEvent.clientY - startY),
-        window.innerHeight - 86,
+      const nextY = Math.min(
+        Math.max(
+          0,
+          restoreBounds
+            ? moveEvent.clientY - pointerOffsetY
+            : baseY + moveEvent.clientY - startY,
+        ),
+        getWorkArea().height - 38,
       );
 
-      if (settings.snapWindows) {
-        if (nextX < 18) {
-          nextX = 0;
-        }
+      setSnapPreview(previewBounds);
 
-        if (nextY < 18) {
-          nextY = 0;
-        }
+      setWindows((current) =>
+        current.map((item) =>
+          item.windowId === windowId
+            ? {
+                ...item,
+                x: nextX,
+                y: nextY,
+                width: dragWidth,
+                height: dragHeight,
+                previousBounds: undefined,
+                maximized: false,
+              }
+            : item,
+        ),
+      );
+    }
 
-        if (window.innerWidth - (nextX + baseWidth) < 18) {
-          nextX = Math.max(0, window.innerWidth - baseWidth);
-        }
+    function onPointerUp(upEvent: globalThis.PointerEvent) {
+      const snapBounds = settings.snapWindows
+        ? getSnapBounds(upEvent.clientX, upEvent.clientY)
+        : null;
+
+      if (snapBounds) {
+        setWindows((current) =>
+          current.map((item) =>
+            item.windowId === windowId
+              ? {
+                  ...item,
+                  ...snapBounds,
+                  previousBounds: restoreBounds ?? {
+                    x: baseX,
+                    y: baseY,
+                    width: dragWidth,
+                    height: dragHeight,
+                  },
+                  maximized: false,
+                }
+              : item,
+          ),
+        );
+      }
+
+      setSnapPreview(null);
+      target.removeEventListener("pointermove", onPointerMove);
+      target.removeEventListener("pointerup", onPointerUp);
+      target.removeEventListener("pointercancel", onPointerUp);
+    }
+
+    target.addEventListener("pointermove", onPointerMove);
+    target.addEventListener("pointerup", onPointerUp);
+    target.addEventListener("pointercancel", onPointerUp);
+  }
+
+  function resizeWindow(
+    event: PointerEvent<HTMLDivElement>,
+    windowId: string,
+    direction: ResizeDirection,
+  ) {
+    event.stopPropagation();
+
+    const target = event.currentTarget;
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const windowState = windows.find((item) => item.windowId === windowId);
+
+    if (!windowState || windowState.maximized) {
+      return;
+    }
+
+    const baseX = windowState.x;
+    const baseY = windowState.y;
+    const baseWidth = windowState.width;
+    const baseHeight = windowState.height;
+
+    target.setPointerCapture(event.pointerId);
+    focusWindow(windowId);
+
+    function onPointerMove(moveEvent: globalThis.PointerEvent) {
+      const workArea = getWorkArea();
+      const deltaX = moveEvent.clientX - startX;
+      const deltaY = moveEvent.clientY - startY;
+      let nextX = baseX;
+      let nextY = baseY;
+      let nextWidth = baseWidth;
+      let nextHeight = baseHeight;
+
+      if (direction.includes("e")) {
+        nextWidth = Math.min(
+          Math.max(MIN_WINDOW_WIDTH, baseWidth + deltaX),
+          workArea.width - baseX,
+        );
+      }
+
+      if (direction.includes("s")) {
+        nextHeight = Math.min(
+          Math.max(MIN_WINDOW_HEIGHT, baseHeight + deltaY),
+          workArea.height - baseY,
+        );
+      }
+
+      if (direction.includes("w")) {
+        const maxLeftMove = baseWidth - MIN_WINDOW_WIDTH;
+        const clampedDeltaX = Math.min(Math.max(deltaX, -baseX), maxLeftMove);
+        nextX = baseX + clampedDeltaX;
+        nextWidth = baseWidth - clampedDeltaX;
+      }
+
+      if (direction.includes("n")) {
+        const maxUpMove = baseHeight - MIN_WINDOW_HEIGHT;
+        const clampedDeltaY = Math.min(Math.max(deltaY, -baseY), maxUpMove);
+        nextY = baseY + clampedDeltaY;
+        nextHeight = baseHeight - clampedDeltaY;
       }
 
       setWindows((current) =>
         current.map((item) =>
-          item.windowId === windowId ? { ...item, x: nextX, y: nextY } : item,
+          item.windowId === windowId
+            ? {
+                ...item,
+                x: nextX,
+                y: nextY,
+                width: nextWidth,
+                height: nextHeight,
+                previousBounds: undefined,
+                maximized: false,
+              }
+            : item,
         ),
       );
     }
@@ -293,10 +491,12 @@ export function useDesktopController() {
     function onPointerUp() {
       target.removeEventListener("pointermove", onPointerMove);
       target.removeEventListener("pointerup", onPointerUp);
+      target.removeEventListener("pointercancel", onPointerUp);
     }
 
     target.addEventListener("pointermove", onPointerMove);
     target.addEventListener("pointerup", onPointerUp);
+    target.addEventListener("pointercancel", onPointerUp);
   }
 
   function navigateExplorer(path: string) {
@@ -384,6 +584,7 @@ export function useDesktopController() {
     icons,
     selectedIcon,
     settings,
+    snapPreview,
     startOpen,
     visibleWindows,
     windows,
@@ -408,5 +609,6 @@ export function useDesktopController() {
     showIconMenu,
     toggleMaximize,
     navigateExplorer,
+    resizeWindow,
   };
 }
