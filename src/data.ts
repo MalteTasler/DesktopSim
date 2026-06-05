@@ -168,7 +168,7 @@ export const fileSystem: Record<string, ExplorerItem[]> = {
 
 export const apps: DesktopApp[] = [
   { id: "files", title: "Explorer", icon: "folder" },
-  { id: "terminal", title: "PowerShell", icon: "terminal" },
+  { id: "terminal", title: "Terminal", icon: "terminal" },
   { id: "settings", title: "Settings", icon: "settings" },
 ];
 

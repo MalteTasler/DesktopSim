@@ -308,28 +308,45 @@ button {
 
 .terminal-pane {
   height: 100%;
-  padding: 14px;
+  overflow: hidden;
   background: #0c0f14;
   color: #e5edf7;
   font: 13px/1.48 Consolas, "Cascadia Mono", monospace;
+  cursor: text;
+}
+
+.terminal-pane__scrollback {
+  height: 100%;
+  overflow: auto;
+  padding: 14px;
 }
 
 .terminal-pane p {
   min-height: 19px;
   margin: 0;
+  white-space: pre-wrap;
 }
 
 .terminal-pane__prompt {
+  margin-right: 6px;
   color: #77d970;
 }
 
-.terminal-pane__caret {
-  display: inline-block;
-  width: 8px;
-  height: 16px;
-  margin-left: 4px;
-  background: #e5edf7;
-  transform: translateY(3px);
+.terminal-pane__form {
+  display: flex;
+  align-items: baseline;
+  min-height: 19px;
+}
+
+.terminal-pane__form input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  caret-color: #e5edf7;
 }
 
 .explorer-pane {
