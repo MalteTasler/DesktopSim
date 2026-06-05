@@ -177,6 +177,8 @@ export const nativeApps: DesktopApp[] = [
 export const webApps: WebAppDefinition[] = [
   { title: "Example", icon: "browser", url: "https://example.com" },
   { title: "Tobit", icon: "shopping", url: "https://tobit.com?fullscreen=6" },
+  { title: "You.Taxi", icon: "map", url: "https://you.taxi?fullscreen=6" },
+  { title: "SuperApp", icon: "folder", url: "https://chayns.de?fullscreen=6" },
 ];
 
 function createWebAppId(title: string, index: number) {

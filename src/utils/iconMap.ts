@@ -1,5 +1,5 @@
 import {
-  CalendarDays,
+  CalendarDays, Car,
   Folder,
   Globe2,
   Mail,
@@ -24,4 +24,5 @@ export const iconMap = {
   shopping: ShoppingBag,
   terminal: Terminal,
   video: Video,
+  car: Car,
 };

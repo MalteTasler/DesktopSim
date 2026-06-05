@@ -6,7 +6,7 @@ import {
   Lock,
   RotateCw,
 } from "lucide-react";
-import { FC, FormEvent, useMemo, useState } from "react";
+import { FC, FormEvent, useMemo, useRef, useState } from "react";
 
 const HOME_URL = "https://example.com";
 
@@ -41,6 +41,7 @@ const BrowserPane: FC<BrowserPaneProps> = ({ fixedTitle, fixedUrl }) => {
   const [address, setAddress] = useState(homeUrl);
   const [frameRevision, setFrameRevision] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const frameRef = useRef<HTMLIFrameElement>(null);
 
   const currentUrl = history[historyIndex];
   const hostname = useMemo(() => {
@@ -71,6 +72,7 @@ const BrowserPane: FC<BrowserPaneProps> = ({ fixedTitle, fixedUrl }) => {
 
   function goBack() {
     if (isFixedWebApp) {
+      frameRef.current?.contentWindow?.history.back();
       return;
     }
 
@@ -84,6 +86,7 @@ const BrowserPane: FC<BrowserPaneProps> = ({ fixedTitle, fixedUrl }) => {
 
   function goForward() {
     if (isFixedWebApp) {
+      frameRef.current?.contentWindow?.history.forward();
       return;
     }
 
@@ -120,26 +123,22 @@ const BrowserPane: FC<BrowserPaneProps> = ({ fixedTitle, fixedUrl }) => {
   return (
     <section className={`browser-pane ${isFixedWebApp ? "browser-pane--fixed" : ""}`}>
       <div className="browser-pane__toolbar">
-        {!isFixedWebApp && (
-          <>
-            <button
-              aria-label="Back"
-              title="Back"
-              onClick={goBack}
-              disabled={historyIndex === 0}
-            >
-              <ArrowLeft size={17} />
-            </button>
-            <button
-              aria-label="Forward"
-              title="Forward"
-              onClick={goForward}
-              disabled={historyIndex === history.length - 1}
-            >
-              <ArrowRight size={17} />
-            </button>
-          </>
-        )}
+        <button
+          aria-label="Back"
+          title="Back"
+          onClick={goBack}
+          disabled={!isFixedWebApp && historyIndex === 0}
+        >
+          <ArrowLeft size={17} />
+        </button>
+        <button
+          aria-label="Forward"
+          title="Forward"
+          onClick={goForward}
+          disabled={!isFixedWebApp && historyIndex === history.length - 1}
+        >
+          <ArrowRight size={17} />
+        </button>
         <button aria-label="Reload" title="Reload" onClick={reload}>
           <RotateCw size={16} />
         </button>
@@ -172,6 +171,7 @@ const BrowserPane: FC<BrowserPaneProps> = ({ fixedTitle, fixedUrl }) => {
       </div>
       <div className="browser-pane__viewport">
         <iframe
+          ref={frameRef}
           key={`${currentUrl}-${frameRevision}`}
           title={hostname}
           src={currentUrl}

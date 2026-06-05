@@ -372,7 +372,7 @@ button {
 }
 
 .browser-pane--fixed .browser-pane__toolbar {
-  grid-template-columns: repeat(2, 32px) minmax(0, 1fr);
+  grid-template-columns: repeat(4, 32px) minmax(0, 1fr);
 }
 
 .desktop--dark .browser-pane__toolbar {
@@ -1249,7 +1249,7 @@ button {
   }
 
   .browser-pane--fixed .browser-pane__toolbar {
-    grid-template-columns: 32px minmax(0, 1fr);
+    grid-template-columns: repeat(3, 32px) minmax(0, 1fr);
   }
 
   .browser-pane__toolbar button[aria-label="Home"] {
