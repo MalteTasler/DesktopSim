@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { accentColors, apps, fileSystem, initialIcons } from "../data";
+import { accentColors, apps, fileSystem } from "../data";
 import {
   ActionCenterState,
   ContextMenuState,
@@ -20,13 +20,19 @@ import {
   SimWindow,
 } from "../types";
 import { formatTime } from "../utils/formatTime";
+import {
+  DESKTOP_TASKBAR_HEIGHT,
+  getViewportSize,
+  layoutDesktopIcons,
+} from "../utils/layoutDesktopIcons";
 
 const MIN_WINDOW_WIDTH = 340;
 const MIN_WINDOW_HEIGHT = 230;
-const TASKBAR_HEIGHT = 48;
 const SNAP_THRESHOLD = 24;
 
 type WindowBounds = Pick<SimWindow, "x" | "y" | "width" | "height">;
+
+type WorkArea = ReturnType<typeof getWorkArea>;
 
 const initialSettings: DesktopSettings = {
   theme: "light",
@@ -55,7 +61,7 @@ const initialActionCenter: ActionCenterState = {
 function getWorkArea() {
   return {
     width: globalThis.window.innerWidth,
-    height: globalThis.window.innerHeight - TASKBAR_HEIGHT,
+    height: globalThis.window.innerHeight - DESKTOP_TASKBAR_HEIGHT,
   };
 }
 
@@ -108,8 +114,54 @@ function getSnapBounds(pointerX: number, pointerY: number): WindowBounds | null 
   return null;
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), Math.max(min, max));
+}
+
+function fitBoundsToWorkArea(bounds: WindowBounds, workArea: WorkArea): WindowBounds {
+  const maxWidth = Math.max(MIN_WINDOW_WIDTH, workArea.width - 16);
+  const maxHeight = Math.max(MIN_WINDOW_HEIGHT, workArea.height - 16);
+  const width = Math.min(Math.max(MIN_WINDOW_WIDTH, bounds.width), maxWidth);
+  const height = Math.min(Math.max(MIN_WINDOW_HEIGHT, bounds.height), maxHeight);
+
+  return {
+    x: clamp(bounds.x, 0, workArea.width - width),
+    y: clamp(bounds.y, 0, workArea.height - height),
+    width,
+    height,
+  };
+}
+
+function fitWindowToWorkArea(windowState: SimWindow, workArea: WorkArea): SimWindow {
+  if (windowState.maximized) {
+    return {
+      ...windowState,
+      x: 8,
+      y: 8,
+      width: Math.max(MIN_WINDOW_WIDTH, workArea.width - 16),
+      height: Math.max(MIN_WINDOW_HEIGHT, workArea.height - 16),
+    };
+  }
+
+  return {
+    ...windowState,
+    ...fitBoundsToWorkArea(windowState, workArea),
+    previousBounds: windowState.previousBounds
+      ? fitBoundsToWorkArea(windowState.previousBounds, workArea)
+      : undefined,
+  };
+}
+
+function fitContextMenuToViewport(menu: ContextMenuState, viewport = getViewportSize()) {
+  return {
+    ...menu,
+    x: clamp(menu.x, 0, viewport.width - 200),
+    y: clamp(menu.y, 0, viewport.height - 220),
+  };
+}
+
 export function useDesktopController() {
-  const [icons, setIcons] = useState(initialIcons);
+  const [icons, setIcons] = useState(() => layoutDesktopIcons(apps));
   const [windows, setWindows] = useState<SimWindow[]>([]);
   const [pinnedTaskbarApps, setPinnedTaskbarApps] = useState<string[]>(() =>
     apps.map((app) => app.id),
@@ -131,6 +183,36 @@ export function useDesktopController() {
     const timer = window.setInterval(() => setClock(new Date()), 30000);
 
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    let animationFrame = 0;
+
+    function onResize() {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(() => {
+        const viewport = getViewportSize();
+        const workArea = getWorkArea();
+
+        setIcons((current) => layoutDesktopIcons(current, viewport));
+        setWindows((current) =>
+          current.map((windowState) => fitWindowToWorkArea(windowState, workArea)),
+        );
+        setSnapPreview((current) =>
+          current ? fitBoundsToWorkArea(current, workArea) : current,
+        );
+        setContextMenu((current) =>
+          current ? fitContextMenuToViewport(current, viewport) : current,
+        );
+      });
+    }
+
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   const visibleWindows = useMemo(
@@ -286,11 +368,7 @@ export function useDesktopController() {
         return left.title.localeCompare(right.title);
       });
 
-      return sorted.map((icon, index) => ({
-        ...icon,
-        x: 32,
-        y: 34 + index * 96,
-      }));
+      return layoutDesktopIcons(sorted, getViewportSize());
     });
     setSelectedIcon(null);
   }
@@ -696,7 +774,7 @@ export function useDesktopController() {
   }
 
   function resetDesktop() {
-    setIcons(initialIcons);
+    setIcons(layoutDesktopIcons(apps));
     setWindows([]);
     setPinnedTaskbarApps(apps.map((app) => app.id));
     setContextMenu(null);

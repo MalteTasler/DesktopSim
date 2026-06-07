@@ -1,4 +1,5 @@
 import { DesktopApp, DesktopIcon, ExplorerItem, WebAppDefinition } from "./types";
+import { layoutDesktopIcons } from "./utils/layoutDesktopIcons";
 
 export const accentColors = ["#2563eb", "#0f766e", "#a16207", "#be123c"];
 
@@ -201,9 +202,5 @@ export const apps: DesktopApp[] = [
 ];
 
 export const initialIcons: DesktopIcon[] = [
-  ...apps.map((app, index) => ({
-    ...app,
-    x: 32,
-    y: 34 + index * 96,
-  })),
+  ...layoutDesktopIcons(apps),
 ];
