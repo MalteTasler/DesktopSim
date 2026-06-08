@@ -1,4 +1,10 @@
 :root {
+  --taskbar-height: 48px;
+  --flyout-gap: 8px;
+  --flyout-bottom: calc(var(--taskbar-height) + var(--flyout-gap));
+  --radius-flyout: 8px;
+  --radius-control: 7px;
+  --radius-compact: 5px;
   color: #f8fafc;
   font-family:
     "Segoe UI",
@@ -60,7 +66,7 @@ button {
 
 .desktop__icon-layer {
   position: absolute;
-  inset: 0 0 48px;
+  inset: 0 0 var(--taskbar-height);
 }
 
 .desktop__status {
@@ -892,7 +898,7 @@ button {
   display: grid;
   grid-template-columns: 52px minmax(160px, 240px) 1fr auto;
   align-items: center;
-  height: 48px;
+  height: var(--taskbar-height);
   gap: 8px;
   padding: 0 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.18);
@@ -912,13 +918,13 @@ button {
 
 .start-menu {
   position: absolute;
-  bottom: 56px;
+  bottom: var(--flyout-bottom);
   left: 10px;
   width: min(360px, calc(100vw - 20px));
   max-height: calc(100vh - 72px);
   overflow: auto;
   border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 8px;
+  border-radius: var(--radius-flyout);
   background: rgba(248, 250, 252, 0.96);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
   color: #0f172a;
@@ -946,7 +952,7 @@ button {
 .start-menu__header button {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--radius-compact);
   background: #eef2f7;
   color: #334155;
 }
@@ -969,7 +975,7 @@ button {
   gap: 7px;
   padding: 10px 6px;
   border: 1px solid transparent;
-  border-radius: 7px;
+  border-radius: var(--radius-control);
   background: #f1f5f9;
   color: #0f172a;
   font-size: 12px;
@@ -989,7 +995,7 @@ button {
 .taskbar__apps button {
   width: 38px;
   height: 38px;
-  border-radius: 5px;
+  border-radius: var(--radius-compact);
 }
 
 .taskbar__start-button:hover,
@@ -1003,7 +1009,7 @@ button {
   height: 34px;
   justify-items: start;
   padding: 0 12px;
-  border-radius: 5px;
+  border-radius: var(--radius-compact);
   background: rgba(255, 255, 255, 0.16);
   color: #dce8f4;
   font-size: 13px;
@@ -1030,6 +1036,7 @@ button {
   position: relative;
   display: flex;
   align-items: center;
+  height: 100%;
   gap: 6px;
   min-width: 126px;
   justify-content: end;
@@ -1038,7 +1045,7 @@ button {
 
 .taskbar__system-tray button {
   height: 30px;
-  border-radius: 5px;
+  border-radius: var(--radius-compact);
 }
 
 .taskbar__system-tray button:hover {
@@ -1055,10 +1062,17 @@ button {
   padding: 0 7px;
 }
 
+.taskbar__clock-button {
+  min-width: 48px;
+  padding: 0 8px;
+  color: inherit;
+  font: inherit;
+}
+
 .action-center {
   position: absolute;
   right: 0;
-  bottom: 42px;
+  bottom: var(--flyout-bottom);
   display: grid;
   width: min(360px, calc(100vw - 20px));
   max-height: calc(100vh - 58px);
@@ -1066,7 +1080,7 @@ button {
   gap: 14px;
   padding: 14px;
   border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 8px;
+  border-radius: var(--radius-flyout);
   background: rgba(248, 250, 252, 0.97);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
   color: #0f172a;
@@ -1084,6 +1098,194 @@ button {
 
 .desktop--dark.desktop--transparency-off .action-center {
   background: #111827;
+}
+
+.clock-flyout {
+  position: absolute;
+  right: 0;
+  bottom: var(--flyout-bottom);
+  display: grid;
+  width: min(344px, calc(100vw - 20px));
+  max-height: calc(100vh - 58px);
+  overflow: auto;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-flyout);
+  background: rgba(248, 250, 252, 0.97);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  color: #0f172a;
+}
+
+.desktop--dark .clock-flyout {
+  border-color: rgba(226, 232, 240, 0.14);
+  background: rgba(15, 23, 42, 0.97);
+  color: #e5edf7;
+}
+
+.desktop--transparency-off .clock-flyout {
+  background: #f8fafc;
+}
+
+.desktop--dark.desktop--transparency-off .clock-flyout {
+  background: #111827;
+}
+
+.clock-flyout__time-card,
+.clock-flyout__calendar-card {
+  border: 1px solid #dbe3ee;
+  border-radius: var(--radius-control);
+  background: #f1f5f9;
+}
+
+.desktop--dark .clock-flyout__time-card,
+.desktop--dark .clock-flyout__calendar-card {
+  border-color: rgba(226, 232, 240, 0.14);
+  background: #1e293b;
+}
+
+.clock-flyout__time-card {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+}
+
+.clock-flyout__time-card svg {
+  color: var(--accent-color);
+}
+
+.clock-flyout__time-card div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.clock-flyout__time-card span,
+.clock-flyout__time-card small {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.desktop--dark .clock-flyout__time-card span,
+.desktop--dark .clock-flyout__time-card small {
+  color: #94a3b8;
+}
+
+.clock-flyout__time-card strong {
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.clock-flyout__calendar-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.clock-flyout__calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.clock-flyout__calendar-header > div {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.clock-flyout__calendar-header svg {
+  color: #0f766e;
+}
+
+.clock-flyout__calendar-header strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clock-flyout__month-controls {
+  flex: 0 0 auto;
+}
+
+.clock-flyout__month-controls button {
+  width: 28px;
+  height: 28px;
+  color: inherit;
+}
+
+.clock-flyout__month-controls button:hover {
+  background: var(--accent-soft);
+}
+
+.clock-flyout__weekdays,
+.clock-flyout__calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  text-align: center;
+}
+
+.clock-flyout__weekdays {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.desktop--dark .clock-flyout__weekdays {
+  color: #94a3b8;
+}
+
+.clock-flyout__calendar-grid button {
+  display: grid;
+  aspect-ratio: 1;
+  min-width: 0;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-compact);
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+}
+
+.clock-flyout__calendar-grid button:hover {
+  border-color: #cbd5e1;
+  background: rgba(226, 232, 240, 0.72);
+}
+
+.desktop--dark .clock-flyout__calendar-grid button:hover {
+  border-color: rgba(226, 232, 240, 0.18);
+  background: rgba(51, 65, 85, 0.82);
+}
+
+.clock-flyout__day--muted {
+  color: #94a3b8 !important;
+}
+
+.desktop--dark .clock-flyout__day--muted {
+  color: #64748b !important;
+}
+
+.clock-flyout__day--selected {
+  border-color: var(--accent-color) !important;
+  background: var(--accent-soft) !important;
+  color: #0f172a !important;
+}
+
+.desktop--dark .clock-flyout__day--selected {
+  color: #e5edf7 !important;
+}
+
+.clock-flyout__day--today {
+  border-color: transparent !important;
+  background: var(--accent-color) !important;
+  color: #ffffff !important;
+  font-weight: 700;
 }
 
 .action-center__header,
@@ -1119,14 +1321,14 @@ button {
 .action-center__header button {
   width: 30px;
   height: 30px;
-  border-radius: 5px;
+  border-radius: var(--radius-compact);
   color: inherit;
 }
 
 .action-center__power-button {
   width: 30px;
   height: 30px;
-  border-radius: 5px;
+  border-radius: var(--radius-compact);
   color: #334155;
 }
 
@@ -1154,7 +1356,7 @@ button {
   gap: 8px;
   padding: 0 10px;
   border: 1px solid #dbe3ee;
-  border-radius: 7px;
+  border-radius: var(--radius-control);
   background: #eef2f7;
   color: #0f172a;
   font-size: 12px;
@@ -1202,7 +1404,7 @@ button {
   gap: 8px;
   padding: 10px;
   border: 1px solid #dbe3ee;
-  border-radius: 7px;
+  border-radius: var(--radius-control);
   background: #f1f5f9;
 }
 
@@ -1238,9 +1440,10 @@ button {
     padding: 0 5px;
   }
 
-  .action-center {
+  .action-center,
+  .clock-flyout {
     right: -6px;
-    bottom: 42px;
+    bottom: var(--flyout-bottom);
   }
 
   .explorer-pane {

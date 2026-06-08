@@ -8,11 +8,13 @@ type TaskbarProps = {
   windows: SimWindow[];
   time: string;
   actionCenterOpen: boolean;
+  clockFlyoutOpen: boolean;
   children: ReactNode;
   onOpenApp: (app: DesktopApp) => void;
   onAppContextMenu: (event: MouseEvent<HTMLButtonElement>, app: DesktopApp) => void;
   onStartToggle: (event: MouseEvent<HTMLButtonElement>) => void;
   onActionCenterToggle: (event: MouseEvent<HTMLButtonElement>) => void;
+  onClockToggle: (event: MouseEvent<HTMLButtonElement>) => void;
 };
 
 const Taskbar: FC<TaskbarProps> = ({
@@ -20,11 +22,13 @@ const Taskbar: FC<TaskbarProps> = ({
   windows,
   time,
   actionCenterOpen,
+  clockFlyoutOpen,
   children,
   onOpenApp,
   onAppContextMenu,
   onStartToggle,
   onActionCenterToggle,
+  onClockToggle,
 }) => (
   <>
     <button className="taskbar__start-button" aria-label="Start" title="Start" onClick={onStartToggle}>
@@ -65,7 +69,14 @@ const Taskbar: FC<TaskbarProps> = ({
         <Volume2 size={14} />
         <Battery size={15} />
       </button>
-      <span>{time}</span>
+      <button
+        className="taskbar__clock-button"
+        aria-label={clockFlyoutOpen ? "Close calendar and clock" : "Open calendar and clock"}
+        title="Calendar and clock"
+        onClick={onClockToggle}
+      >
+        {time}
+      </button>
     </div>
   </>
 );

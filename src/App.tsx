@@ -1,6 +1,7 @@
 import { CloudSun } from "lucide-react";
 import { FC } from "react";
 import ActionCenter from "./components/ActionCenter";
+import ClockFlyout from "./components/ClockFlyout";
 import ContextMenu from "./components/ContextMenu";
 import DesktopIconButton from "./components/DesktopIconButton";
 import DesktopWindow from "./components/DesktopWindow";
@@ -25,6 +26,7 @@ const App: FC = () => {
         desktop.setContextMenu(null);
         desktop.setStartOpen(false);
         desktop.setActionCenterOpen(false);
+        desktop.setClockFlyoutOpen(false);
       }}
       onContextMenu={desktop.showDesktopMenu}
     >
@@ -104,6 +106,7 @@ const App: FC = () => {
           apps={desktop.taskbarApps}
           windows={desktop.windows}
           time={desktop.clock}
+          clockFlyoutOpen={desktop.clockFlyoutOpen}
           actionCenterOpen={desktop.actionCenterOpen}
           onOpenApp={desktop.openApp}
           onAppContextMenu={desktop.showTaskbarAppMenu}
@@ -111,12 +114,20 @@ const App: FC = () => {
             event.stopPropagation();
             desktop.setStartOpen((current) => !current);
             desktop.setActionCenterOpen(false);
+            desktop.setClockFlyoutOpen(false);
             desktop.setContextMenu(null);
           }}
           onActionCenterToggle={(event) => {
             event.stopPropagation();
             desktop.setStartOpen(false);
+            desktop.setClockFlyoutOpen(false);
             desktop.setActionCenterOpen((current) => !current);
+          }}
+          onClockToggle={(event) => {
+            event.stopPropagation();
+            desktop.setStartOpen(false);
+            desktop.setActionCenterOpen(false);
+            desktop.setClockFlyoutOpen((current) => !current);
           }}
         >
           {desktop.actionCenterOpen && (
@@ -127,6 +138,7 @@ const App: FC = () => {
               onPower={desktop.resetDesktop}
             />
           )}
+          {desktop.clockFlyoutOpen && <ClockFlyout date={desktop.clockDate} />}
         </Taskbar>
       </footer>
     </main>

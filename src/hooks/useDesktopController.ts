@@ -172,6 +172,7 @@ export function useDesktopController() {
   const [snapPreview, setSnapPreview] = useState<WindowBounds | null>(null);
   const [startOpen, setStartOpen] = useState(false);
   const [actionCenterOpen, setActionCenterOpen] = useState(false);
+  const [clockFlyoutOpen, setClockFlyoutOpen] = useState(false);
   const [clock, setClock] = useState(() => new Date());
   const [settings, setSettings] = useState<DesktopSettings>(initialSettings);
   const [explorer, setExplorer] = useState<ExplorerState>(initialExplorer);
@@ -180,7 +181,7 @@ export function useDesktopController() {
   const zCounter = useRef(10);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setClock(new Date()), 30000);
+    const timer = window.setInterval(() => setClock(new Date()), 1000);
 
     return () => window.clearInterval(timer);
   }, []);
@@ -300,6 +301,7 @@ export function useDesktopController() {
     setContextMenu(null);
     setStartOpen(false);
     setActionCenterOpen(false);
+    setClockFlyoutOpen(false);
   }
 
   function closeWindow(windowId: string) {
@@ -783,6 +785,7 @@ export function useDesktopController() {
     setSnapPreview(null);
     setStartOpen(false);
     setActionCenterOpen(false);
+    setClockFlyoutOpen(false);
     setSettings(initialSettings);
     setExplorer(initialExplorer);
     setActionCenter(initialActionCenter);
@@ -794,6 +797,8 @@ export function useDesktopController() {
     actionCenterOpen,
     activeWindow,
     clock: formatTime(clock),
+    clockDate: clock,
+    clockFlyoutOpen,
     contextMenu,
     desktopStyle,
     explorer,
@@ -818,6 +823,7 @@ export function useDesktopController() {
     selectExplorerItem,
     setActionCenter,
     setActionCenterOpen,
+    setClockFlyoutOpen,
     setContextMenu,
     setSettings,
     setSelectedIcon,
