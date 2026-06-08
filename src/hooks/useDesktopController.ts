@@ -513,7 +513,7 @@ export function useDesktopController() {
     const startY = event.clientY;
     const windowState = windows.find((item) => item.windowId === windowId);
 
-    if (!windowState || windowState.maximized) {
+    if (!windowState || (windowState.maximized && !windowState.previousBounds)) {
       return;
     }
 
