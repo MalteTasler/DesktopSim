@@ -1,16 +1,18 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { DesktopApp, DesktopSettings, SimWindow } from "../../../types";
 import {
   createDragWindowHandler,
   createResizeWindowHandler,
 } from "../../../utils/os/window/windowInteractions";
+import { WindowBounds } from "../../../utils/os/window/windowGeometry";
+import { useWindowStacking } from "./useWindowStacking";
 import {
-  MIN_WINDOW_HEIGHT,
-  MIN_WINDOW_WIDTH,
-  WindowBounds,
-  fitWindowToWorkArea,
-  getWorkArea,
-} from "../../../utils/os/window/windowGeometry";
+  createWindowState,
+  fitWindowStatesToWorkArea,
+  minimizeWindowState,
+  restoreWindow,
+  toggleMaximizedWindow,
+} from "./windowState";
 
 type UseWindowManagerOptions = {
   settings: DesktopSettings;
@@ -22,69 +24,29 @@ export function useWindowManager({
   onNewWindowOpen,
 }: UseWindowManagerOptions) {
   const [windows, setWindows] = useState<SimWindow[]>([]);
-  const [activeWindow, setActiveWindow] = useState<string | null>(null);
   const [snapPreview, setSnapPreview] = useState<WindowBounds | null>(null);
-  const zCounter = useRef(10);
+  const stacking = useWindowStacking({ setWindows });
 
   const visibleWindows = useMemo(
     () => windows.filter((windowState) => !windowState.minimized),
     [windows],
   );
 
-  function focusWindow(windowId: string) {
-    const zIndex = ++zCounter.current;
-    setActiveWindow(windowId);
-    setWindows((current) =>
-      current.map((windowState) =>
-        windowState.windowId === windowId ? { ...windowState, zIndex } : windowState,
-      ),
-    );
-  }
-
   function openApp(app: DesktopApp) {
     const existing = windows.find((windowState) => windowState.id === app.id);
 
     if (existing) {
-      focusWindow(existing.windowId);
-      setWindows((current) =>
-        current.map((windowState) =>
-          windowState.windowId === existing.windowId
-            ? { ...windowState, minimized: false }
-            : windowState,
-        ),
-      );
+      stacking.focusWindow(existing.windowId);
+      setWindows((current) => restoreWindow(current, existing.windowId));
       return;
     }
 
     const offset = windows.length * 28;
-    const windowId = `${app.id}-${crypto.randomUUID()}`;
-    const zIndex = ++zCounter.current;
+    const zIndex = stacking.nextZIndex();
+    const nextWindow = createWindowState(app, offset, zIndex);
 
-    setWindows((current) => [
-      ...current,
-      {
-        ...app,
-        windowId,
-        x: 190 + offset,
-        y: 80 + offset,
-        width:
-          app.kind === "web" || app.id === "browser"
-            ? 820
-            : app.id === "terminal"
-              ? 640
-              : 520,
-        height:
-          app.kind === "web" || app.id === "browser"
-            ? 560
-            : app.id === "terminal"
-              ? 390
-              : 340,
-        zIndex,
-        minimized: false,
-        maximized: false,
-      },
-    ]);
-    setActiveWindow(windowId);
+    setWindows((current) => [...current, nextWindow]);
+    stacking.setActiveWindow(nextWindow.windowId);
     onNewWindowOpen();
   }
 
@@ -92,88 +54,47 @@ export function useWindowManager({
     setWindows((current) =>
       current.filter((windowState) => windowState.windowId !== windowId),
     );
-    setActiveWindow((current) => (current === windowId ? null : current));
+    stacking.setActiveWindow((current) => (current === windowId ? null : current));
   }
 
   function minimizeWindow(windowId: string) {
-    setWindows((current) =>
-      current.map((windowState) =>
-        windowState.windowId === windowId
-          ? { ...windowState, minimized: true }
-          : windowState,
-      ),
-    );
+    setWindows((current) => minimizeWindowState(current, windowId));
   }
 
   function toggleMaximize(windowId: string) {
-    setWindows((current) =>
-      current.map((item) => {
-        if (item.windowId !== windowId) {
-          return item;
-        }
-
-        if (item.maximized && item.previousBounds) {
-          return {
-            ...item,
-            ...item.previousBounds,
-            previousBounds: undefined,
-            maximized: false,
-          };
-        }
-
-        return {
-          ...item,
-          previousBounds: {
-            x: item.x,
-            y: item.y,
-            width: item.width,
-            height: item.height,
-          },
-          x: 8,
-          y: 8,
-          width: Math.max(MIN_WINDOW_WIDTH, globalThis.window.innerWidth - 16),
-          height: Math.max(MIN_WINDOW_HEIGHT, globalThis.window.innerHeight - 64),
-          maximized: true,
-        };
-      }),
-    );
-    focusWindow(windowId);
+    setWindows((current) => toggleMaximizedWindow(current, windowId));
+    stacking.focusWindow(windowId);
   }
 
   function fitWindowsToWorkArea() {
-    const workArea = getWorkArea();
-
-    setWindows((current) =>
-      current.map((windowState) => fitWindowToWorkArea(windowState, workArea)),
-    );
+    setWindows(fitWindowStatesToWorkArea);
   }
 
   function resetWindows() {
     setWindows([]);
-    setActiveWindow(null);
     setSnapPreview(null);
-    zCounter.current = 10;
+    stacking.resetStacking();
   }
 
   return {
-    activeWindow,
+    activeWindow: stacking.activeWindow,
     snapPreview,
     visibleWindows,
     windows,
     closeWindow,
     dragWindow: createDragWindowHandler({
-      focusWindow,
+      focusWindow: stacking.focusWindow,
       setSnapPreview,
       setWindows,
       settings,
       windows,
     }),
     fitWindowsToWorkArea,
-    focusWindow,
+    focusWindow: stacking.focusWindow,
     minimizeWindow,
     openApp,
     resizeWindow: createResizeWindowHandler({
-      focusWindow,
+      focusWindow: stacking.focusWindow,
       setSnapPreview,
       setWindows,
       settings,
