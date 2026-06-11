@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction } from "react";
+import { Dispatch, FC, ReactNode, SetStateAction } from "react";
 import { DesktopApp, DesktopSettings, ExplorerItem, ExplorerState } from "../../../types";
 import BrowserPane from "../../apps/BrowserPane";
 import ExplorerPane from "../../apps/ExplorerPane";
@@ -19,52 +19,48 @@ type WindowContentProps = {
   onExplorerOpen: (item: ExplorerItem) => void;
 };
 
-const WindowContent: FC<WindowContentProps> = ({
-  app,
-  settings,
-  onSettingsChange,
-  onResetPersistentSettings,
-  explorer,
-  onExplorerNavigate,
-  onExplorerBack,
-  onExplorerForward,
-  onExplorerUp,
-  onExplorerSelect,
-  onExplorerOpen,
-}) => {
-  if (app.kind === "web" && app.url) {
-    return <BrowserPane fixedTitle={app.title} fixedUrl={app.url} />;
-  }
+type AppRenderer = (props: WindowContentProps) => ReactNode;
 
-  if (app.id === "browser") {
-    return <BrowserPane />;
-  }
-
-  if (app.id === "terminal") {
-    return <TerminalPane />;
-  }
-
-  if (app.id === "files") {
-    return (
-      <ExplorerPane
-        state={explorer}
-        onNavigate={onExplorerNavigate}
-        onBack={onExplorerBack}
-        onForward={onExplorerForward}
-        onUp={onExplorerUp}
-        onSelect={onExplorerSelect}
-        onOpen={onExplorerOpen}
-      />
-    );
-  }
-
-  return (
+const appRenderers: Record<string, AppRenderer> = {
+  browser: () => <BrowserPane />,
+  terminal: () => <TerminalPane />,
+  files: ({
+    explorer,
+    onExplorerBack,
+    onExplorerForward,
+    onExplorerNavigate,
+    onExplorerOpen,
+    onExplorerSelect,
+    onExplorerUp,
+  }) => (
+    <ExplorerPane
+      state={explorer}
+      onNavigate={onExplorerNavigate}
+      onBack={onExplorerBack}
+      onForward={onExplorerForward}
+      onUp={onExplorerUp}
+      onSelect={onExplorerSelect}
+      onOpen={onExplorerOpen}
+    />
+  ),
+  settings: ({ settings, onSettingsChange, onResetPersistentSettings }) => (
     <SettingsPane
       settings={settings}
       onSettingsChange={onSettingsChange}
       onResetPersistentSettings={onResetPersistentSettings}
     />
-  );
+  ),
+};
+
+const WindowContent: FC<WindowContentProps> = ({
+  app,
+  ...props
+}) => {
+  if (app.kind === "web" && app.url) {
+    return <BrowserPane fixedTitle={app.title} fixedUrl={app.url} />;
+  }
+
+  return appRenderers[app.id]?.({ app, ...props }) ?? appRenderers.settings({ app, ...props });
 };
 
 WindowContent.displayName = "WindowContent";

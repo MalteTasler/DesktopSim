@@ -46,9 +46,7 @@ const App: FC = () => {
       onClick={() => {
         desktop.setSelectedIcon(null);
         desktop.setContextMenu(null);
-        desktop.setStartPanelOpen(false);
-        desktop.setActionCenterOpen(false);
-        desktop.setClockPanelOpen(false);
+        desktop.setActivePanel(null);
       }}
       onContextMenu={desktop.showDesktopMenu}
     >
@@ -145,29 +143,23 @@ const App: FC = () => {
           onAppContextMenu={desktop.showShellAppMenu}
           onStartToggle={(event) => {
             event.stopPropagation();
-            desktop.setStartPanelOpen((current) => !current);
-            desktop.setActionCenterOpen(false);
-            desktop.setClockPanelOpen(false);
+            desktop.togglePanel("start");
             desktop.setContextMenu(null);
           }}
           onActionCenterToggle={(event) => {
             event.stopPropagation();
-            desktop.setStartPanelOpen(false);
-            desktop.setClockPanelOpen(false);
-            desktop.setActionCenterOpen((current) => !current);
+            desktop.togglePanel("action-center");
           }}
           onClockToggle={(event) => {
             event.stopPropagation();
-            desktop.setStartPanelOpen(false);
-            desktop.setActionCenterOpen(false);
-            desktop.setClockPanelOpen((current) => !current);
+            desktop.togglePanel("clock");
           }}
         >
           {desktop.actionCenterOpen && (
             <ActionCenterPanel
               state={desktop.actionCenter}
               onChange={desktop.setActionCenter}
-              onClose={() => desktop.setActionCenterOpen(false)}
+              onClose={() => desktop.setActivePanel(null)}
               onPower={desktop.resetDesktop}
             />
           )}

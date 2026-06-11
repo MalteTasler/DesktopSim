@@ -1,6 +1,7 @@
 import { Dispatch, MouseEvent, SetStateAction, useState } from "react";
 import { ContextMenuState, DesktopApp, SimWindow } from "../../../types";
 import { getViewportSize } from "../../../utils/os/desktop/layoutDesktopIcons";
+import { createAppContextMenu, createDesktopContextMenu } from "./contextMenuFactories";
 
 type UseContextMenusOptions = {
   closeWindow: (windowId: string) => void;
@@ -63,29 +64,17 @@ export function useContextMenus({
     setContextMenu({
       x: event.clientX,
       y: event.clientY,
-      items: [
-        { label: "Open", onSelect: () => openApp(app) },
-        {
-          label: isPinned ? "Unpin from taskbar" : "Pin to taskbar",
-          onSelect: () => toggleShellPin(app.id),
-        },
-        ...(options.includeWindowActions && appWindow
-          ? [
-              {
-                label: "Minimize",
-                onSelect: () => minimizeWindow(appWindow.windowId),
-              },
-              {
-                label: appWindow.maximized ? "Restore" : "Maximize",
-                onSelect: () => toggleMaximize(appWindow.windowId),
-              },
-              {
-                label: "Close",
-                onSelect: () => closeWindow(appWindow.windowId),
-              },
-            ]
-          : []),
-      ],
+      items: createAppContextMenu({
+        app,
+        appWindow,
+        includeWindowActions: options.includeWindowActions,
+        isPinned,
+        onCloseWindow: closeWindow,
+        onMinimizeWindow: minimizeWindow,
+        onOpenApp: openApp,
+        onToggleMaximize: toggleMaximize,
+        onToggleShellPin: toggleShellPin,
+      }),
     });
   }
 
@@ -107,11 +96,10 @@ export function useContextMenus({
     setContextMenu({
       x: event.clientX,
       y: event.clientY,
-      items: [
-        { label: "Sort by name", onSelect: () => sortDesktopIcons("name") },
-        { label: "Sort by type", onSelect: () => sortDesktopIcons("type") },
-        { label: "Display settings", onSelect: openDisplaySettings },
-      ],
+      items: createDesktopContextMenu({
+        onOpenDisplaySettings: openDisplaySettings,
+        onSortDesktopIcons: sortDesktopIcons,
+      }),
     });
   }
 

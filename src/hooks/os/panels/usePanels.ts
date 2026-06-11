@@ -1,23 +1,25 @@
 import { useState } from "react";
 
+export type PanelId = "start" | "action-center" | "clock";
+
 export function usePanels() {
-  const [startPanelOpen, setStartPanelOpen] = useState(false);
-  const [actionCenterOpen, setActionCenterOpen] = useState(false);
-  const [clockPanelOpen, setClockPanelOpen] = useState(false);
+  const [activePanel, setActivePanel] = useState<PanelId | null>(null);
 
   function closePanels() {
-    setStartPanelOpen(false);
-    setActionCenterOpen(false);
-    setClockPanelOpen(false);
+    setActivePanel(null);
+  }
+
+  function togglePanel(panelId: PanelId) {
+    setActivePanel((current) => (current === panelId ? null : panelId));
   }
 
   return {
-    actionCenterOpen,
-    clockPanelOpen,
-    startPanelOpen,
+    activePanel,
+    actionCenterOpen: activePanel === "action-center",
+    clockPanelOpen: activePanel === "clock",
+    startPanelOpen: activePanel === "start",
     closePanels,
-    setActionCenterOpen,
-    setClockPanelOpen,
-    setStartPanelOpen,
+    setActivePanel,
+    togglePanel,
   };
 }
