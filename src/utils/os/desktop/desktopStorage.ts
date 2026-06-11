@@ -4,7 +4,7 @@ import { clamp } from "../window/windowGeometry";
 
 const STORAGE_KEYS = {
   settings: "desktop-sim:settings",
-  pinnedShellApps: "desktop-sim:pinned-taskbar-apps",
+  pinnedShellApps: "desktop-sim:pinned-shell-apps",
   actionCenter: "desktop-sim:action-center",
 } as const;
 

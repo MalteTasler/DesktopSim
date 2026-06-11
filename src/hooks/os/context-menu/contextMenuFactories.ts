@@ -31,7 +31,7 @@ export function createAppContextMenu({
   return [
     { label: "Open", onSelect: () => onOpenApp(app) },
     {
-      label: isPinned ? "Unpin from taskbar" : "Pin to taskbar",
+      label: isPinned ? "Unpin from dock" : "Pin to dock",
       onSelect: () => onToggleShellPin(app.id),
     },
     ...(includeWindowActions && appWindow
