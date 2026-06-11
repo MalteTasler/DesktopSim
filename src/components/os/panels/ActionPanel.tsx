@@ -13,14 +13,14 @@ import { Dispatch, FC, SetStateAction } from "react";
 import { ActionCenterState } from "../../../types";
 import { UI_CATEGORY } from "../../../utils/os/ui/uiCategories";
 
-type ActionCenterPanelProps = {
+type ActionPanelProps = {
   state: ActionCenterState;
   onChange: Dispatch<SetStateAction<ActionCenterState>>;
   onClose: () => void;
   onPower: () => void;
 };
 
-const ActionCenterPanel: FC<ActionCenterPanelProps> = ({
+const ActionPanel: FC<ActionPanelProps> = ({
   state,
   onChange,
   onClose,
@@ -137,6 +137,6 @@ const ActionCenterPanel: FC<ActionCenterPanelProps> = ({
   );
 };
 
-ActionCenterPanel.displayName = "ActionCenterPanel";
+ActionPanel.displayName = "ActionPanel";
 
-export default ActionCenterPanel;
+export default ActionPanel;

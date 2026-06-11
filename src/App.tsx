@@ -1,7 +1,7 @@
 import { CloudSun } from "lucide-react";
 import { FC, useEffect } from "react";
-import ActionCenterPanel from "./components/os/panels/ActionCenterPanel";
-import ClockPanel from "./components/os/panels/ClockPanel";
+import ActionPanel from "./components/os/panels/ActionPanel";
+import TimePanel from "./components/os/panels/TimePanel";
 import ContextMenu from "./components/os/context-menu/ContextMenu";
 import DesktopIconButton from "./components/os/desktop/DesktopIconButton";
 import DesktopWindow from "./components/os/window/DesktopWindow";
@@ -156,14 +156,14 @@ const App: FC = () => {
           }}
         >
           {desktop.actionCenterOpen && (
-            <ActionCenterPanel
+            <ActionPanel
               state={desktop.actionCenter}
               onChange={desktop.setActionCenter}
               onClose={() => desktop.setActivePanel(null)}
               onPower={desktop.resetDesktop}
             />
           )}
-          {desktop.clockPanelOpen && <ClockPanel date={desktop.clockDate} />}
+          {desktop.clockPanelOpen && <TimePanel date={desktop.clockDate} />}
         </Shell>
       </footer>
     </main>

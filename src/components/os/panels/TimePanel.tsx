@@ -2,7 +2,7 @@ import { CalendarDays, ChevronDown, ChevronUp, Clock3 } from "lucide-react";
 import { FC, useState } from "react";
 import { UI_CATEGORY } from "../../../utils/os/ui/uiCategories";
 
-type ClockPanelProps = {
+type TimePanelProps = {
   date: Date;
 };
 
@@ -58,7 +58,7 @@ function getMonthDate(date: Date, offset: number) {
   return new Date(year, month + offset, 1);
 }
 
-const ClockPanel: FC<ClockPanelProps> = ({ date }) => {
+const TimePanel: FC<TimePanelProps> = ({ date }) => {
   const [viewDate, setViewDate] = useState(() => new Date(date));
   const [selectedDate, setSelectedDate] = useState(() => new Date(date));
   const calendarCells = getCalendarCells(viewDate, date, selectedDate);
@@ -158,6 +158,6 @@ const ClockPanel: FC<ClockPanelProps> = ({ date }) => {
   );
 };
 
-ClockPanel.displayName = "ClockPanel";
+TimePanel.displayName = "TimePanel";
 
-export default ClockPanel;
+export default TimePanel;
