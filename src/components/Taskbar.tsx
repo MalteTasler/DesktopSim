@@ -7,6 +7,7 @@ type TaskbarProps = {
   apps: DesktopApp[];
   windows: SimWindow[];
   time: string;
+  startOpen: boolean;
   actionCenterOpen: boolean;
   clockFlyoutOpen: boolean;
   children: ReactNode;
@@ -21,6 +22,7 @@ const Taskbar: FC<TaskbarProps> = ({
   apps,
   windows,
   time,
+  startOpen,
   actionCenterOpen,
   clockFlyoutOpen,
   children,
@@ -31,7 +33,15 @@ const Taskbar: FC<TaskbarProps> = ({
   onClockToggle,
 }) => (
   <>
-    <button className="taskbar__start-button" aria-label="Start" title="Start" onClick={onStartToggle}>
+    <button
+      className="taskbar__start-button"
+      aria-label={startOpen ? "Close Start" : "Open Start"}
+      aria-controls="start-menu"
+      aria-expanded={startOpen}
+      aria-haspopup="dialog"
+      title="Start"
+      onClick={onStartToggle}
+    >
       <Monitor size={21} />
     </button>
     <div className="taskbar__search-box">
@@ -62,6 +72,9 @@ const Taskbar: FC<TaskbarProps> = ({
       <button
         className="taskbar__tray-status-button"
         aria-label={actionCenterOpen ? "Close quick settings" : "Open quick settings"}
+        aria-controls="action-center"
+        aria-expanded={actionCenterOpen}
+        aria-haspopup="dialog"
         title="Quick settings"
         onClick={onActionCenterToggle}
       >
@@ -72,6 +85,9 @@ const Taskbar: FC<TaskbarProps> = ({
       <button
         className="taskbar__clock-button"
         aria-label={clockFlyoutOpen ? "Close calendar and clock" : "Open calendar and clock"}
+        aria-controls="clock-flyout"
+        aria-expanded={clockFlyoutOpen}
+        aria-haspopup="dialog"
         title="Calendar and clock"
         onClick={onClockToggle}
       >

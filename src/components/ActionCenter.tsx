@@ -31,8 +31,10 @@ const ActionCenter: FC<ActionCenterProps> = ({ state, onChange, onClose, onPower
 
   return (
     <section
-      className="action-center"
+      id="action-center"
+      className="taskbar-flyout action-center"
       aria-label="Action center"
+      tabIndex={-1}
       onClick={(event) => event.stopPropagation()}
     >
       <div className="action-center__header">

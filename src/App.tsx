@@ -1,5 +1,5 @@
 import { CloudSun } from "lucide-react";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import ActionCenter from "./components/ActionCenter";
 import ClockFlyout from "./components/ClockFlyout";
 import ContextMenu from "./components/ContextMenu";
@@ -12,6 +12,26 @@ import { useDesktopController } from "./hooks/useDesktopController";
 
 const App: FC = () => {
   const desktop = useDesktopController();
+
+  useEffect(() => {
+    const flyoutId = desktop.startOpen
+      ? "start-menu"
+      : desktop.actionCenterOpen
+        ? "action-center"
+        : desktop.clockFlyoutOpen
+          ? "clock-flyout"
+          : null;
+
+    if (!flyoutId) {
+      return;
+    }
+
+    const animationFrame = window.requestAnimationFrame(() => {
+      document.getElementById(flyoutId)?.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [desktop.actionCenterOpen, desktop.clockFlyoutOpen, desktop.startOpen]);
 
   return (
     <main
@@ -106,6 +126,7 @@ const App: FC = () => {
           apps={desktop.taskbarApps}
           windows={desktop.windows}
           time={desktop.clock}
+          startOpen={desktop.startOpen}
           clockFlyoutOpen={desktop.clockFlyoutOpen}
           actionCenterOpen={desktop.actionCenterOpen}
           onOpenApp={desktop.openApp}

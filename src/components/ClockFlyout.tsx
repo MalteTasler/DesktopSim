@@ -78,8 +78,10 @@ const ClockFlyout: FC<ClockFlyoutProps> = ({ date }) => {
 
   return (
     <section
-      className="clock-flyout"
+      id="clock-flyout"
+      className="taskbar-flyout clock-flyout"
       aria-label="Calendar and clock"
+      tabIndex={-1}
       onClick={(event) => event.stopPropagation()}
     >
       <div className="clock-flyout__time-card">

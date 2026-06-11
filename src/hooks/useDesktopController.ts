@@ -29,6 +29,11 @@ import {
 const MIN_WINDOW_WIDTH = 340;
 const MIN_WINDOW_HEIGHT = 230;
 const SNAP_THRESHOLD = 24;
+const STORAGE_KEYS = {
+  settings: "desktop-sim:settings",
+  pinnedTaskbarApps: "desktop-sim:pinned-taskbar-apps",
+  actionCenter: "desktop-sim:action-center",
+} as const;
 
 type WindowBounds = Pick<SimWindow, "x" | "y" | "width" | "height">;
 
@@ -57,6 +62,114 @@ const initialActionCenter: ActionCenterState = {
   volume: 62,
   brightness: 74,
 };
+
+function readStorageValue<T>(key: string, fallback: T, validate: (value: unknown) => T) {
+  try {
+    const rawValue = globalThis.localStorage?.getItem(key);
+
+    return rawValue ? validate(JSON.parse(rawValue)) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeStorageValue(key: string, value: unknown) {
+  try {
+    globalThis.localStorage?.setItem(key, JSON.stringify(value));
+  } catch {
+    // Storage can be unavailable in private sessions or restricted embeds.
+  }
+}
+
+function readStoredSettings() {
+  return readStorageValue(STORAGE_KEYS.settings, initialSettings, (value) => {
+    if (!value || typeof value !== "object") {
+      return initialSettings;
+    }
+
+    const settings = value as Partial<DesktopSettings>;
+
+    return {
+      ...initialSettings,
+      theme: settings.theme === "dark" || settings.theme === "light"
+        ? settings.theme
+        : initialSettings.theme,
+      transparency:
+        typeof settings.transparency === "boolean"
+          ? settings.transparency
+          : initialSettings.transparency,
+      snapWindows:
+        typeof settings.snapWindows === "boolean"
+          ? settings.snapWindows
+          : initialSettings.snapWindows,
+      accentIntensity:
+        typeof settings.accentIntensity === "number"
+          ? clamp(settings.accentIntensity, 0, 100)
+          : initialSettings.accentIntensity,
+      accentColor:
+        typeof settings.accentColor === "string" &&
+        accentColors.includes(settings.accentColor)
+          ? settings.accentColor
+          : initialSettings.accentColor,
+    };
+  });
+}
+
+function readStoredPinnedApps() {
+  return readStorageValue(
+    STORAGE_KEYS.pinnedTaskbarApps,
+    apps.map((app) => app.id),
+    (value) => {
+      if (!Array.isArray(value)) {
+        return apps.map((app) => app.id);
+      }
+
+      const appIds = new Set(apps.map((app) => app.id));
+
+      return value.filter(
+        (appId): appId is string => typeof appId === "string" && appIds.has(appId),
+      );
+    },
+  );
+}
+
+function readStoredActionCenter() {
+  return readStorageValue(STORAGE_KEYS.actionCenter, initialActionCenter, (value) => {
+    if (!value || typeof value !== "object") {
+      return initialActionCenter;
+    }
+
+    const actionCenter = value as Partial<ActionCenterState>;
+
+    return {
+      ...initialActionCenter,
+      wifi:
+        typeof actionCenter.wifi === "boolean"
+          ? actionCenter.wifi
+          : initialActionCenter.wifi,
+      bluetooth:
+        typeof actionCenter.bluetooth === "boolean"
+          ? actionCenter.bluetooth
+          : initialActionCenter.bluetooth,
+      batterySaver:
+        typeof actionCenter.batterySaver === "boolean"
+          ? actionCenter.batterySaver
+          : initialActionCenter.batterySaver,
+      focusAssist:
+        typeof actionCenter.focusAssist === "boolean"
+          ? actionCenter.focusAssist
+          : initialActionCenter.focusAssist,
+      volume:
+        typeof actionCenter.volume === "number"
+          ? clamp(actionCenter.volume, 0, 100)
+          : initialActionCenter.volume,
+      brightness:
+        typeof actionCenter.brightness === "number"
+          ? clamp(actionCenter.brightness, 20, 100)
+          : initialActionCenter.brightness,
+    };
+  });
+}
 
 function getWorkArea() {
   return {
@@ -163,9 +276,8 @@ function fitContextMenuToViewport(menu: ContextMenuState, viewport = getViewport
 export function useDesktopController() {
   const [icons, setIcons] = useState(() => layoutDesktopIcons(apps));
   const [windows, setWindows] = useState<SimWindow[]>([]);
-  const [pinnedTaskbarApps, setPinnedTaskbarApps] = useState<string[]>(() =>
-    apps.map((app) => app.id),
-  );
+  const [pinnedTaskbarApps, setPinnedTaskbarApps] =
+    useState<string[]>(readStoredPinnedApps);
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [activeWindow, setActiveWindow] = useState<string | null>(null);
@@ -174,16 +286,46 @@ export function useDesktopController() {
   const [actionCenterOpen, setActionCenterOpen] = useState(false);
   const [clockFlyoutOpen, setClockFlyoutOpen] = useState(false);
   const [clock, setClock] = useState(() => new Date());
-  const [settings, setSettings] = useState<DesktopSettings>(initialSettings);
+  const [settings, setSettings] = useState<DesktopSettings>(readStoredSettings);
   const [explorer, setExplorer] = useState<ExplorerState>(initialExplorer);
   const [actionCenter, setActionCenter] =
-    useState<ActionCenterState>(initialActionCenter);
+    useState<ActionCenterState>(readStoredActionCenter);
   const zCounter = useRef(10);
 
   useEffect(() => {
     const timer = window.setInterval(() => setClock(new Date()), 1000);
 
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    writeStorageValue(STORAGE_KEYS.settings, settings);
+  }, [settings]);
+
+  useEffect(() => {
+    writeStorageValue(STORAGE_KEYS.pinnedTaskbarApps, pinnedTaskbarApps);
+  }, [pinnedTaskbarApps]);
+
+  useEffect(() => {
+    writeStorageValue(STORAGE_KEYS.actionCenter, actionCenter);
+  }, [actionCenter]);
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setStartOpen(false);
+      setActionCenterOpen(false);
+      setClockFlyoutOpen(false);
+      setContextMenu(null);
+      setSelectedIcon(null);
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
   useEffect(() => {

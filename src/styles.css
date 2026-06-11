@@ -2,9 +2,20 @@
   --taskbar-height: 48px;
   --flyout-gap: 8px;
   --flyout-bottom: calc(var(--taskbar-height) + var(--flyout-gap));
+  --surface-flyout: rgba(248, 250, 252, 0.97);
+  --surface-flyout-solid: #f8fafc;
+  --surface-flyout-dark: rgba(15, 23, 42, 0.97);
+  --surface-flyout-dark-solid: #111827;
+  --border-flyout: rgba(255, 255, 255, 0.22);
+  --border-flyout-dark: rgba(226, 232, 240, 0.14);
+  --shadow-flyout: 0 24px 70px rgba(0, 0, 0, 0.42);
   --radius-flyout: 8px;
   --radius-control: 7px;
   --radius-compact: 5px;
+  --spacing-flyout: 14px;
+  --motion-fast: 160ms;
+  --motion-standard: 220ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   color: #f8fafc;
   font-family:
     "Segoe UI",
@@ -148,7 +159,7 @@ button {
 
 .desktop--transparency-off .window,
 .desktop--transparency-off .context-menu,
-.desktop--transparency-off .start-menu {
+.desktop--transparency-off .taskbar-flyout {
   background: #f8fafc;
 }
 
@@ -160,7 +171,7 @@ button {
 
 .desktop--dark.desktop--transparency-off .window,
 .desktop--dark.desktop--transparency-off .context-menu,
-.desktop--dark.desktop--transparency-off .start-menu {
+.desktop--dark.desktop--transparency-off .taskbar-flyout {
   background: #111827;
 }
 
@@ -916,24 +927,72 @@ button {
   background: rgba(3, 7, 18, 0.86);
 }
 
-.start-menu {
+.taskbar-flyout {
   position: absolute;
   bottom: var(--flyout-bottom);
-  left: 10px;
-  width: min(360px, calc(100vw - 20px));
-  max-height: calc(100vh - 72px);
   overflow: auto;
   border: 1px solid rgba(255, 255, 255, 0.22);
+  border-color: var(--border-flyout);
   border-radius: var(--radius-flyout);
-  background: rgba(248, 250, 252, 0.96);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  background: var(--surface-flyout);
+  box-shadow: var(--shadow-flyout);
   color: #0f172a;
+  animation: flyout-enter var(--motion-standard) var(--ease-standard);
+  transform-origin: bottom center;
 }
 
-.desktop--dark .start-menu {
-  border-color: rgba(226, 232, 240, 0.14);
-  background: rgba(15, 23, 42, 0.96);
+.taskbar-flyout:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-color), #ffffff 24%);
+  outline-offset: 2px;
+}
+
+.taskbar-flyout button {
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+}
+
+.desktop--dark .taskbar-flyout {
+  border-color: var(--border-flyout-dark);
+  background: var(--surface-flyout-dark);
   color: #e5edf7;
+}
+
+.desktop--transparency-off .taskbar-flyout {
+  background: var(--surface-flyout-solid);
+}
+
+.desktop--dark.desktop--transparency-off .taskbar-flyout {
+  background: var(--surface-flyout-dark-solid);
+}
+
+@keyframes flyout-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .taskbar-flyout {
+    animation: none;
+  }
+
+  .taskbar-flyout button {
+    transition: none;
+  }
+}
+
+.start-menu {
+  left: 10px;
+  width: min(360px, calc(100vw - 20px));
+  max-height: calc(100vh - var(--flyout-bottom) - 16px);
 }
 
 .start-menu > div {
@@ -1070,65 +1129,23 @@ button {
 }
 
 .action-center {
-  position: absolute;
   right: 0;
-  bottom: var(--flyout-bottom);
   display: grid;
   width: min(360px, calc(100vw - 20px));
-  max-height: calc(100vh - 58px);
-  overflow: auto;
+  max-height: calc(100vh - var(--flyout-bottom) - 16px);
   gap: 14px;
-  padding: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: var(--radius-flyout);
-  background: rgba(248, 250, 252, 0.97);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
-  color: #0f172a;
-}
-
-.desktop--dark .action-center {
-  border-color: rgba(226, 232, 240, 0.14);
-  background: rgba(15, 23, 42, 0.97);
-  color: #e5edf7;
-}
-
-.desktop--transparency-off .action-center {
-  background: #f8fafc;
-}
-
-.desktop--dark.desktop--transparency-off .action-center {
-  background: #111827;
+  padding: var(--spacing-flyout);
+  transform-origin: bottom right;
 }
 
 .clock-flyout {
-  position: absolute;
   right: 0;
-  bottom: var(--flyout-bottom);
   display: grid;
   width: min(344px, calc(100vw - 20px));
-  max-height: calc(100vh - 58px);
-  overflow: auto;
+  max-height: calc(100vh - var(--flyout-bottom) - 16px);
   gap: 10px;
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: var(--radius-flyout);
-  background: rgba(248, 250, 252, 0.97);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
-  color: #0f172a;
-}
-
-.desktop--dark .clock-flyout {
-  border-color: rgba(226, 232, 240, 0.14);
-  background: rgba(15, 23, 42, 0.97);
-  color: #e5edf7;
-}
-
-.desktop--transparency-off .clock-flyout {
-  background: #f8fafc;
-}
-
-.desktop--dark.desktop--transparency-off .clock-flyout {
-  background: #111827;
+  transform-origin: bottom right;
 }
 
 .clock-flyout__time-card,

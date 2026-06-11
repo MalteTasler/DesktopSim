@@ -9,7 +9,12 @@ type StartMenuProps = {
 };
 
 const StartMenu: FC<StartMenuProps> = ({ apps, onOpenApp, onAppContextMenu }) => (
-  <section className="start-menu" aria-label="Start menu">
+  <section
+    id="start-menu"
+    className="taskbar-flyout start-menu"
+    aria-label="Start menu"
+    tabIndex={-1}
+  >
     <div onClick={(event) => event.stopPropagation()}>
       <div className="start-menu__header">
         <span>DesktopSim</span>
