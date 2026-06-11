@@ -920,7 +920,6 @@ export function useDesktopController() {
   function resetDesktop() {
     setIcons(layoutDesktopIcons(apps));
     setWindows([]);
-    setPinnedTaskbarApps(apps.map((app) => app.id));
     setContextMenu(null);
     setSelectedIcon(null);
     setActiveWindow(null);
@@ -928,10 +927,14 @@ export function useDesktopController() {
     setStartOpen(false);
     setActionCenterOpen(false);
     setClockFlyoutOpen(false);
-    setSettings(initialSettings);
     setExplorer(initialExplorer);
-    setActionCenter(initialActionCenter);
     zCounter.current = 10;
+  }
+
+  function resetPersistentSettings() {
+    setPinnedTaskbarApps(apps.map((app) => app.id));
+    setSettings(initialSettings);
+    setActionCenter(initialActionCenter);
   }
 
   return {
@@ -978,5 +981,6 @@ export function useDesktopController() {
     navigateExplorer,
     resizeWindow,
     resetDesktop,
+    resetPersistentSettings,
   };
 }

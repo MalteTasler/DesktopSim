@@ -9,6 +9,7 @@ type WindowContentProps = {
   app: DesktopApp;
   settings: DesktopSettings;
   onSettingsChange: Dispatch<SetStateAction<DesktopSettings>>;
+  onResetPersistentSettings: () => void;
   explorer: ExplorerState;
   onExplorerNavigate: (path: string) => void;
   onExplorerBack: () => void;
@@ -22,6 +23,7 @@ const WindowContent: FC<WindowContentProps> = ({
   app,
   settings,
   onSettingsChange,
+  onResetPersistentSettings,
   explorer,
   onExplorerNavigate,
   onExplorerBack,
@@ -56,7 +58,13 @@ const WindowContent: FC<WindowContentProps> = ({
     );
   }
 
-  return <SettingsPane settings={settings} onSettingsChange={onSettingsChange} />;
+  return (
+    <SettingsPane
+      settings={settings}
+      onSettingsChange={onSettingsChange}
+      onResetPersistentSettings={onResetPersistentSettings}
+    />
+  );
 };
 
 WindowContent.displayName = "WindowContent";

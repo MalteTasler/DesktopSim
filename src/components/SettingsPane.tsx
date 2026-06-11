@@ -1,4 +1,4 @@
-import { Check, Grip } from "lucide-react";
+import { Check, Grip, RotateCcw } from "lucide-react";
 import { Dispatch, FC, SetStateAction } from "react";
 import { accentColors } from "../data";
 import { DesktopSettings } from "../types";
@@ -6,9 +6,14 @@ import { DesktopSettings } from "../types";
 type SettingsPaneProps = {
   settings: DesktopSettings;
   onSettingsChange: Dispatch<SetStateAction<DesktopSettings>>;
+  onResetPersistentSettings: () => void;
 };
 
-const SettingsPane: FC<SettingsPaneProps> = ({ settings, onSettingsChange }) => (
+const SettingsPane: FC<SettingsPaneProps> = ({
+  settings,
+  onSettingsChange,
+  onResetPersistentSettings,
+}) => (
   <div className="settings-pane">
     <div className="settings-pane__row">
       <span>Theme</span>
@@ -87,6 +92,17 @@ const SettingsPane: FC<SettingsPaneProps> = ({ settings, onSettingsChange }) => 
           </button>
         ))}
       </div>
+    </div>
+    <div className="settings-pane__row">
+      <span>Persistent settings</span>
+      <button
+        className="settings-pane__reset-button"
+        type="button"
+        onClick={onResetPersistentSettings}
+      >
+        <RotateCcw size={15} />
+        <span>Reset</span>
+      </button>
     </div>
     <div className="settings-pane__resize-hint">
       <Grip size={18} />

@@ -97,6 +97,7 @@ const App: FC = () => {
           }
           settings={desktop.settings}
           onSettingsChange={desktop.setSettings}
+          onResetPersistentSettings={desktop.resetPersistentSettings}
           explorer={desktop.explorer}
           onExplorerNavigate={desktop.navigateExplorer}
           onExplorerBack={desktop.goExplorerBack}

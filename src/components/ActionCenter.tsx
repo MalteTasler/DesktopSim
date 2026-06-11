@@ -112,8 +112,8 @@ const ActionCenter: FC<ActionCenterProps> = ({ state, onChange, onClose, onPower
       <div className="action-center__footer">
         <button
           className="action-center__power-button"
-          aria-label="Reset desktop"
-          title="Reset desktop"
+          aria-label="Reset active workspace"
+          title="Reset active workspace"
           onClick={onPower}
         >
           <Power size={16} />

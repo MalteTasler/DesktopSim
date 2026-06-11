@@ -24,6 +24,7 @@ type DesktopWindowProps = {
   ) => void;
   settings: DesktopSettings;
   onSettingsChange: Dispatch<SetStateAction<DesktopSettings>>;
+  onResetPersistentSettings: () => void;
   explorer: ExplorerState;
   onExplorerNavigate: (path: string) => void;
   onExplorerBack: () => void;
@@ -44,6 +45,7 @@ const DesktopWindow: FC<DesktopWindowProps> = ({
   onResize,
   settings,
   onSettingsChange,
+  onResetPersistentSettings,
   explorer,
   onExplorerNavigate,
   onExplorerBack,
@@ -108,6 +110,7 @@ const DesktopWindow: FC<DesktopWindowProps> = ({
           app={window}
           settings={settings}
           onSettingsChange={onSettingsChange}
+          onResetPersistentSettings={onResetPersistentSettings}
           explorer={explorer}
           onExplorerNavigate={onExplorerNavigate}
           onExplorerBack={onExplorerBack}
