@@ -1,19 +1,25 @@
 import { Dispatch, MouseEvent, SetStateAction, useState } from "react";
-import { ContextMenuState, DesktopApp, SimWindow } from "../../../types";
+import {
+  AppDefinition,
+  ContextMenuState,
+  DesktopShortcut,
+  WindowInstance,
+} from "../../../types";
+import { getAppDefinition } from "../../../apps/appRegistry";
 import { getViewportSize } from "../../../utils/os/desktop/layoutDesktopIcons";
 import { createAppContextMenu, createDesktopContextMenu } from "./contextMenuFactories";
 
 type UseContextMenusOptions = {
   closeWindow: (windowId: string) => void;
   minimizeWindow: (windowId: string) => void;
-  openApp: (app: DesktopApp) => void;
+  openApp: (app: AppDefinition) => void;
   openDisplaySettings: () => void;
   pinnedShellApps: string[];
   setPinnedShellApps: Dispatch<SetStateAction<string[]>>;
   setSelectedIcon: (iconId: string | null) => void;
   sortDesktopIcons: (sortBy: "name" | "type") => void;
   toggleMaximize: (windowId: string) => void;
-  windows: SimWindow[];
+  windows: WindowInstance[];
 };
 
 export function fitContextMenuToViewport(
@@ -51,16 +57,16 @@ export function useContextMenus({
 
   function showAppMenu(
     event: MouseEvent,
-    app: DesktopApp,
-    options: { includeWindowActions?: boolean } = {},
+    app: AppDefinition,
+    options: { includeWindowActions?: boolean; selectedShortcutId?: string | null } = {},
   ) {
     event.preventDefault();
     event.stopPropagation();
 
-    const appWindow = windows.find((windowState) => windowState.id === app.id);
+    const appWindow = windows.find((windowState) => windowState.appId === app.id);
     const isPinned = pinnedShellApps.includes(app.id);
 
-    setSelectedIcon(app.id);
+    setSelectedIcon(options.selectedShortcutId ?? null);
     setContextMenu({
       x: event.clientX,
       y: event.clientY,
@@ -107,8 +113,14 @@ export function useContextMenus({
     contextMenu,
     setContextMenu,
     showDesktopMenu,
-    showIconMenu: (event: MouseEvent, icon: DesktopApp) => showAppMenu(event, icon),
-    showShellAppMenu: (event: MouseEvent, app: DesktopApp) =>
+    showIconMenu: (event: MouseEvent, shortcut: DesktopShortcut) => {
+      const app = getAppDefinition(shortcut.appId);
+
+      if (app) {
+        showAppMenu(event, app, { selectedShortcutId: shortcut.shortcutId });
+      }
+    },
+    showShellAppMenu: (event: MouseEvent, app: AppDefinition) =>
       showAppMenu(event, app, { includeWindowActions: true }),
   };
 }

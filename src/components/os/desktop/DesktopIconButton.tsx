@@ -1,10 +1,10 @@
 import { FC, PointerEvent } from "react";
-import { DesktopIcon } from "../../../types";
+import { DesktopShortcut } from "../../../types";
 import { iconMap } from "../../../utils/os/desktop/iconMap";
 import { UI_CATEGORY } from "../../../utils/os/ui/uiCategories";
 
 type DesktopIconButtonProps = {
-  icon: DesktopIcon;
+  icon: DesktopShortcut;
   isSelected: boolean;
   onSelect: () => void;
   onOpen: () => void;

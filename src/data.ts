@@ -1,5 +1,4 @@
-import { DesktopApp, DesktopIcon, ExplorerItem, WebAppDefinition } from "./types";
-import { layoutDesktopIcons } from "./utils/os/desktop/layoutDesktopIcons";
+import { ExplorerItem } from "./types";
 
 export const accentColors = ["#2563eb", "#0f766e", "#a16207", "#be123c"];
 
@@ -166,41 +165,3 @@ export const fileSystem: Record<string, ExplorerItem[]> = {
   ],
   "Desktop/Projects/Archive": [],
 };
-
-export const nativeApps: DesktopApp[] = [
-  { id: "browser", title: "Browser", icon: "browser" },
-  { id: "files", title: "Explorer", icon: "folder" },
-  { id: "terminal", title: "Terminal", icon: "terminal" },
-  { id: "settings", title: "Settings", icon: "settings" },
-];
-
-// Add web apps here with only title, icon, and url.
-export const webApps: WebAppDefinition[] = [
-  { title: "Example", icon: "browser", url: "https://example.com" },
-  { title: "Tobit", icon: "shopping", url: "https://tobit.com?fullscreen=6" },
-  { title: "You.Taxi", icon: "map", url: "https://you.taxi?fullscreen=6" },
-  { title: "SuperApp", icon: "folder", url: "https://chayns.de?fullscreen=6" },
-];
-
-function createWebAppId(title: string, index: number) {
-  const slug = title
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-
-  return `web-${slug || index + 1}`;
-}
-
-export const apps: DesktopApp[] = [
-  ...nativeApps.map((app) => ({ ...app, kind: "native" as const })),
-  ...webApps.map((app, index) => ({
-    ...app,
-    id: createWebAppId(app.title, index),
-    kind: "web" as const,
-  })),
-];
-
-export const initialIcons: DesktopIcon[] = [
-  ...layoutDesktopIcons(apps),
-];

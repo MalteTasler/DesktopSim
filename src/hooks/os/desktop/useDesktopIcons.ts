@@ -1,6 +1,6 @@
 import { PointerEvent, useState } from "react";
-import { apps } from "../../../data";
-import { DesktopApp } from "../../../types";
+import { apps } from "../../../apps/appRegistry";
+import { DesktopShortcut } from "../../../types";
 import {
   getViewportSize,
   layoutDesktopIcons,
@@ -29,11 +29,11 @@ export function useDesktopIcons() {
     setSelectedIcon(null);
   }
 
-  function dragIcon(event: PointerEvent<HTMLButtonElement>, iconId: string) {
+  function dragIcon(event: PointerEvent<HTMLButtonElement>, shortcutId: string) {
     const target = event.currentTarget;
     const startX = event.clientX;
     const startY = event.clientY;
-    const icon = icons.find((item) => item.id === iconId);
+    const icon = icons.find((item) => item.shortcutId === shortcutId);
 
     if (!icon) {
       return;
@@ -43,7 +43,7 @@ export function useDesktopIcons() {
     const baseY = icon.y;
 
     target.setPointerCapture(event.pointerId);
-    setSelectedIcon(iconId);
+    setSelectedIcon(shortcutId);
 
     function onPointerMove(moveEvent: globalThis.PointerEvent) {
       const nextX = Math.min(
@@ -57,7 +57,7 @@ export function useDesktopIcons() {
 
       setIcons((current) =>
         current.map((item) =>
-          item.id === iconId ? { ...item, x: nextX, y: nextY } : item,
+          item.shortcutId === shortcutId ? { ...item, x: nextX, y: nextY } : item,
         ),
       );
     }
@@ -76,8 +76,8 @@ export function useDesktopIcons() {
     setSelectedIcon(null);
   }
 
-  function selectDesktopIcon(iconId: DesktopApp["id"]) {
-    setSelectedIcon(iconId);
+  function selectDesktopIcon(shortcutId: DesktopShortcut["shortcutId"]) {
+    setSelectedIcon(shortcutId);
   }
 
   return {

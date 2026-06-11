@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { apps } from "../../../data";
-import { DesktopApp } from "../../../types";
+import { apps, getAppDefinition } from "../../../apps/appRegistry";
+import { DesktopShortcut } from "../../../types";
 import { useExplorerState } from "../../apps/useExplorerState";
 import {
   fitContextMenuToViewport,
@@ -97,7 +97,7 @@ export function useDesktopController() {
       apps.filter(
         (app) =>
           persistent.pinnedShellApps.includes(app.id) ||
-          windows.windows.some((windowState) => windowState.id === app.id),
+          windows.windows.some((windowState) => windowState.appId === app.id),
       ),
     [persistent.pinnedShellApps, windows.windows],
   );
@@ -121,6 +121,14 @@ export function useDesktopController() {
       future: [],
       selectedId: null,
     });
+  }
+
+  function openDesktopShortcut(shortcut: DesktopShortcut) {
+    const app = getAppDefinition(shortcut.appId);
+
+    if (app) {
+      windows.openApp(app);
+    }
   }
 
   return {
@@ -153,6 +161,7 @@ export function useDesktopController() {
     goExplorerUp: explorer.goExplorerUp,
     minimizeWindow: windows.minimizeWindow,
     openApp: windows.openApp,
+    openDesktopShortcut,
     openExplorerItem: explorer.openExplorerItem,
     selectDesktopIcon: icons.selectDesktopIcon,
     selectExplorerItem: explorer.selectExplorerItem,

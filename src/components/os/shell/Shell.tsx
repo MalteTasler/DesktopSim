@@ -1,18 +1,18 @@
 import { Battery, Monitor, Search, Volume2, Wifi } from "lucide-react";
 import { FC, MouseEvent, ReactNode } from "react";
-import { DesktopApp, SimWindow } from "../../../types";
+import { AppDefinition, WindowInstance } from "../../../types";
 import { iconMap } from "../../../utils/os/desktop/iconMap";
 
 type ShellProps = {
-  apps: DesktopApp[];
-  windows: SimWindow[];
+  apps: AppDefinition[];
+  windows: WindowInstance[];
   time: string;
   startPanelOpen: boolean;
   actionCenterOpen: boolean;
   clockPanelOpen: boolean;
   children: ReactNode;
-  onOpenApp: (app: DesktopApp) => void;
-  onAppContextMenu: (event: MouseEvent<HTMLButtonElement>, app: DesktopApp) => void;
+  onOpenApp: (app: AppDefinition) => void;
+  onAppContextMenu: (event: MouseEvent<HTMLButtonElement>, app: AppDefinition) => void;
   onStartToggle: (event: MouseEvent<HTMLButtonElement>) => void;
   onActionCenterToggle: (event: MouseEvent<HTMLButtonElement>) => void;
   onClockToggle: (event: MouseEvent<HTMLButtonElement>) => void;
@@ -51,7 +51,7 @@ const Shell: FC<ShellProps> = ({
     <div className="shell__apps">
       {apps.map((app) => {
         const Icon = iconMap[app.icon];
-        const isRunning = windows.some((windowState) => windowState.id === app.id);
+        const isRunning = windows.some((windowState) => windowState.appId === app.id);
 
         return (
           <button

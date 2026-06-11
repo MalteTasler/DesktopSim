@@ -1,13 +1,13 @@
-import { ContextMenuItem, DesktopApp, SimWindow } from "../../../types";
+import { AppDefinition, ContextMenuItem, WindowInstance } from "../../../types";
 
 type AppMenuOptions = {
-  app: DesktopApp;
-  appWindow?: SimWindow;
+  app: AppDefinition;
+  appWindow?: WindowInstance;
   includeWindowActions?: boolean;
   isPinned: boolean;
   onCloseWindow: (windowId: string) => void;
   onMinimizeWindow: (windowId: string) => void;
-  onOpenApp: (app: DesktopApp) => void;
+  onOpenApp: (app: AppDefinition) => void;
   onToggleMaximize: (windowId: string) => void;
   onToggleShellPin: (appId: string) => void;
 };

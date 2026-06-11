@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { DesktopApp, DesktopSettings, SimWindow } from "../../../types";
+import { AppDefinition, DesktopSettings, WindowInstance } from "../../../types";
 import {
   createDragWindowHandler,
   createResizeWindowHandler,
@@ -23,7 +23,7 @@ export function useWindowManager({
   settings,
   onNewWindowOpen,
 }: UseWindowManagerOptions) {
-  const [windows, setWindows] = useState<SimWindow[]>([]);
+  const [windows, setWindows] = useState<WindowInstance[]>([]);
   const [snapPreview, setSnapPreview] = useState<WindowBounds | null>(null);
   const stacking = useWindowStacking({ setWindows });
 
@@ -32,8 +32,8 @@ export function useWindowManager({
     [windows],
   );
 
-  function openApp(app: DesktopApp) {
-    const existing = windows.find((windowState) => windowState.id === app.id);
+  function openApp(app: AppDefinition) {
+    const existing = windows.find((windowState) => windowState.appId === app.id);
 
     if (existing) {
       stacking.focusWindow(existing.windowId);
@@ -102,6 +102,7 @@ export function useWindowManager({
     }),
     resetWindows,
     setSnapPreview,
+    setWindows,
     toggleMaximize,
   };
 }

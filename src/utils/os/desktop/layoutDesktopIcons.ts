@@ -1,4 +1,4 @@
-import { DesktopApp, DesktopIcon } from "../../../types";
+import { AppDefinition, DesktopShortcut } from "../../../types";
 
 export const DESKTOP_SHELL_HEIGHT = 48;
 
@@ -32,9 +32,9 @@ export function getViewportSize(): ViewportSize {
 }
 
 export function layoutDesktopIcons(
-  apps: DesktopApp[],
+  apps: Array<Pick<AppDefinition, "id" | "title" | "icon"> | DesktopShortcut>,
   viewport = getViewportSize(),
-): DesktopIcon[] {
+): DesktopShortcut[] {
   const desktopHeight = Math.max(ICON_HEIGHT, viewport.height - DESKTOP_SHELL_HEIGHT);
   const rows = Math.max(
     1,
@@ -47,9 +47,13 @@ export function layoutDesktopIcons(
   return apps.map((app, index) => {
     const column = Math.floor(index / rows);
     const row = index % rows;
+    const appId = "appId" in app ? app.appId : app.id;
 
     return {
-      ...app,
+      shortcutId: "shortcutId" in app ? app.shortcutId : `shortcut-${app.id}`,
+      appId,
+      title: app.title,
+      icon: app.icon,
       x: ICON_START_X + column * ICON_COLUMN_STEP,
       y: ICON_START_Y + row * ICON_ROW_STEP,
     };

@@ -1,5 +1,5 @@
 import { CSSProperties, useEffect, useState } from "react";
-import { apps } from "../../../data";
+import { apps } from "../../../apps/appRegistry";
 import { ActionCenterState, DesktopSettings } from "../../../types";
 import {
   initialActionCenter,

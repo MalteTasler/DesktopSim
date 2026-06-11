@@ -7,7 +7,7 @@ import DesktopIconButton from "./components/os/desktop/DesktopIconButton";
 import DesktopWindow from "./components/os/window/DesktopWindow";
 import Shell from "./components/os/shell/Shell";
 import StartPanel from "./components/os/panels/StartPanel";
-import { apps } from "./data";
+import { apps } from "./apps/appRegistry";
 import { useDesktopController } from "./hooks/os/desktop/useDesktopController";
 import { UI_CATEGORY } from "./utils/os/ui/uiCategories";
 
@@ -80,13 +80,13 @@ const App: FC = () => {
       >
         {desktop.icons.map((icon) => (
           <DesktopIconButton
-            key={icon.id}
+            key={icon.shortcutId}
             icon={icon}
-            isSelected={desktop.selectedIcon === icon.id}
-            onSelect={() => desktop.selectDesktopIcon(icon.id)}
-            onOpen={() => desktop.openApp(icon)}
+            isSelected={desktop.selectedIcon === icon.shortcutId}
+            onSelect={() => desktop.selectDesktopIcon(icon.shortcutId)}
+            onOpen={() => desktop.openDesktopShortcut(icon)}
             onContextMenu={(event) => desktop.showIconMenu(event, icon)}
-            onDrag={(event) => desktop.dragIcon(event, icon.id)}
+            onDrag={(event) => desktop.dragIcon(event, icon.shortcutId)}
           />
         ))}
       </section>
@@ -129,7 +129,7 @@ const App: FC = () => {
           <StartPanel
             apps={apps}
             onOpenApp={desktop.openApp}
-            onAppContextMenu={desktop.showIconMenu}
+            onAppContextMenu={desktop.showShellAppMenu}
           />
         )}
         <Shell

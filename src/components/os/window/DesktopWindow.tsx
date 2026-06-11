@@ -5,14 +5,14 @@ import {
   ExplorerItem,
   ExplorerState,
   ResizeDirection,
-  SimWindow,
+  WindowInstance,
 } from "../../../types";
 import { iconMap } from "../../../utils/os/desktop/iconMap";
 import { UI_CATEGORY } from "../../../utils/os/ui/uiCategories";
 import WindowContent from "./WindowContent";
 
 type DesktopWindowProps = {
-  window: SimWindow;
+  window: WindowInstance;
   isActive: boolean;
   onClose: () => void;
   onMinimize: () => void;
@@ -109,7 +109,7 @@ const DesktopWindow: FC<DesktopWindowProps> = ({
       </div>
       <div className="window__body">
         <WindowContent
-          app={window}
+          window={window}
           settings={settings}
           onSettingsChange={onSettingsChange}
           onResetPersistentSettings={onResetPersistentSettings}

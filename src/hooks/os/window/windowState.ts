@@ -1,4 +1,4 @@
-import { DesktopApp, SimWindow } from "../../../types";
+import { AppDefinition, WindowInstance } from "../../../types";
 import {
   MIN_WINDOW_HEIGHT,
   MIN_WINDOW_WIDTH,
@@ -6,31 +6,35 @@ import {
   getWorkArea,
 } from "../../../utils/os/window/windowGeometry";
 
-export function createWindowState(app: DesktopApp, offset: number, zIndex: number): SimWindow {
+export function createWindowState(
+  app: AppDefinition,
+  offset: number,
+  zIndex: number,
+): WindowInstance {
+  const defaultSize = app.defaultWindowSize ?? {
+    width: 520,
+    height: 340,
+  };
+
   return {
-    ...app,
     windowId: `${app.id}-${crypto.randomUUID()}`,
+    appId: app.id,
+    title: app.title,
+    icon: app.icon,
+    kind: app.kind,
+    url: app.url,
+    appState: app.createInitialState?.(),
     x: 190 + offset,
     y: 80 + offset,
-    width:
-      app.kind === "web" || app.id === "browser"
-        ? 820
-        : app.id === "terminal"
-          ? 640
-          : 520,
-    height:
-      app.kind === "web" || app.id === "browser"
-        ? 560
-        : app.id === "terminal"
-          ? 390
-          : 340,
+    width: defaultSize.width,
+    height: defaultSize.height,
     zIndex,
     minimized: false,
     maximized: false,
   };
 }
 
-export function restoreWindow(windows: SimWindow[], windowId: string) {
+export function restoreWindow(windows: WindowInstance[], windowId: string) {
   return windows.map((windowState) =>
     windowState.windowId === windowId
       ? { ...windowState, minimized: false }
@@ -38,7 +42,7 @@ export function restoreWindow(windows: SimWindow[], windowId: string) {
   );
 }
 
-export function minimizeWindowState(windows: SimWindow[], windowId: string) {
+export function minimizeWindowState(windows: WindowInstance[], windowId: string) {
   return windows.map((windowState) =>
     windowState.windowId === windowId
       ? { ...windowState, minimized: true }
@@ -46,7 +50,7 @@ export function minimizeWindowState(windows: SimWindow[], windowId: string) {
   );
 }
 
-export function toggleMaximizedWindow(windows: SimWindow[], windowId: string) {
+export function toggleMaximizedWindow(windows: WindowInstance[], windowId: string) {
   return windows.map((item) => {
     if (item.windowId !== windowId) {
       return item;
@@ -78,7 +82,7 @@ export function toggleMaximizedWindow(windows: SimWindow[], windowId: string) {
   });
 }
 
-export function fitWindowStatesToWorkArea(windows: SimWindow[]) {
+export function fitWindowStatesToWorkArea(windows: WindowInstance[]) {
   const workArea = getWorkArea();
 
   return windows.map((windowState) => fitWindowToWorkArea(windowState, workArea));

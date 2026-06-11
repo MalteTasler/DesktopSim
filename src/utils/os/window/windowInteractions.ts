@@ -1,5 +1,5 @@
 import { Dispatch, PointerEvent, SetStateAction } from "react";
-import { DesktopSettings, ResizeDirection, SimWindow } from "../../../types";
+import { DesktopSettings, ResizeDirection, WindowInstance } from "../../../types";
 import {
   WindowBounds,
   getResizedBounds,
@@ -7,7 +7,7 @@ import {
   getWorkArea,
 } from "./windowGeometry";
 
-type SetWindows = Dispatch<SetStateAction<SimWindow[]>>;
+type SetWindows = Dispatch<SetStateAction<WindowInstance[]>>;
 type SetSnapPreview = Dispatch<SetStateAction<WindowBounds | null>>;
 
 type WindowInteractionOptions = {
@@ -15,7 +15,7 @@ type WindowInteractionOptions = {
   setSnapPreview: SetSnapPreview;
   setWindows: SetWindows;
   settings: DesktopSettings;
-  windows: SimWindow[];
+  windows: WindowInstance[];
 };
 
 export function createDragWindowHandler({

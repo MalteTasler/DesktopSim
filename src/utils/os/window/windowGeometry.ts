@@ -1,4 +1,4 @@
-import { ResizeDirection, SimWindow } from "../../../types";
+import { ResizeDirection, WindowInstance } from "../../../types";
 import { DESKTOP_SHELL_HEIGHT } from "../desktop/layoutDesktopIcons";
 
 export const MIN_WINDOW_WIDTH = 340;
@@ -6,7 +6,7 @@ export const MIN_WINDOW_HEIGHT = 230;
 
 const SNAP_THRESHOLD = 24;
 
-export type WindowBounds = Pick<SimWindow, "x" | "y" | "width" | "height">;
+export type WindowBounds = Pick<WindowInstance, "x" | "y" | "width" | "height">;
 export type WorkArea = ReturnType<typeof getWorkArea>;
 
 export function getWorkArea() {
@@ -83,7 +83,10 @@ export function fitBoundsToWorkArea(bounds: WindowBounds, workArea: WorkArea): W
   };
 }
 
-export function fitWindowToWorkArea(windowState: SimWindow, workArea: WorkArea): SimWindow {
+export function fitWindowToWorkArea(
+  windowState: WindowInstance,
+  workArea: WorkArea,
+): WindowInstance {
   if (windowState.maximized) {
     return {
       ...windowState,

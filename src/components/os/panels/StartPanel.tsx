@@ -1,12 +1,12 @@
 import { FC, MouseEvent } from "react";
-import { DesktopApp } from "../../../types";
+import { AppDefinition } from "../../../types";
 import { iconMap } from "../../../utils/os/desktop/iconMap";
 import { UI_CATEGORY } from "../../../utils/os/ui/uiCategories";
 
 type StartPanelProps = {
-  apps: DesktopApp[];
-  onOpenApp: (app: DesktopApp) => void;
-  onAppContextMenu: (event: MouseEvent<HTMLButtonElement>, app: DesktopApp) => void;
+  apps: AppDefinition[];
+  onOpenApp: (app: AppDefinition) => void;
+  onAppContextMenu: (event: MouseEvent<HTMLButtonElement>, app: AppDefinition) => void;
 };
 
 const StartPanel: FC<StartPanelProps> = ({ apps, onOpenApp, onAppContextMenu }) => (

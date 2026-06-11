@@ -1,4 +1,5 @@
-import { accentColors, apps } from "../../../data";
+import { apps } from "../../../apps/appRegistry";
+import { accentColors } from "../../../data";
 import { ActionCenterState, DesktopSettings, ExplorerState } from "../../../types";
 import { clamp } from "../window/windowGeometry";
 

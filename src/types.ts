@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export type DesktopAppIcon =
   | "browser"
   | "calendar"
@@ -11,12 +13,17 @@ export type DesktopAppIcon =
   | "terminal"
   | "video";
 
-export type DesktopApp = {
+export type AppDefinition = {
   id: string;
   title: string;
   icon: DesktopAppIcon;
-  kind?: "native" | "web";
+  kind: "native" | "web";
   url?: string;
+  defaultWindowSize?: {
+    width: number;
+    height: number;
+  };
+  createInitialState?: () => unknown;
 };
 
 export type WebAppDefinition = {
@@ -25,22 +32,39 @@ export type WebAppDefinition = {
   url: string;
 };
 
-export type DesktopIcon = DesktopApp & {
+export type DesktopShortcut = {
+  shortcutId: string;
+  appId: AppDefinition["id"];
+  title: string;
+  icon: DesktopAppIcon;
   x: number;
   y: number;
 };
 
-export type SimWindow = DesktopApp & {
+export type WindowInstance = {
   windowId: string;
+  appId: AppDefinition["id"];
+  title: string;
+  icon: DesktopAppIcon;
+  kind: AppDefinition["kind"];
+  url?: string;
+  appState?: unknown;
   x: number;
   y: number;
   width: number;
   height: number;
-  previousBounds?: Pick<SimWindow, "x" | "y" | "width" | "height">;
+  previousBounds?: Pick<WindowInstance, "x" | "y" | "width" | "height">;
   zIndex: number;
   minimized: boolean;
   maximized: boolean;
 };
+
+export type AppWindowRenderProps = {
+  app: AppDefinition;
+  window: WindowInstance;
+};
+
+export type AppWindowRenderer = (props: AppWindowRenderProps) => ReactNode;
 
 export type ResizeDirection =
   | "n"

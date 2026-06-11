@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction, useRef, useState } from "react";
-import { SimWindow } from "../../../types";
+import { WindowInstance } from "../../../types";
 
 type UseWindowStackingOptions = {
-  setWindows: Dispatch<SetStateAction<SimWindow[]>>;
+  setWindows: Dispatch<SetStateAction<WindowInstance[]>>;
 };
 
 export function useWindowStacking({ setWindows }: UseWindowStackingOptions) {
