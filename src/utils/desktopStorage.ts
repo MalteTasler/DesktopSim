@@ -1,0 +1,141 @@
+import { accentColors, apps } from "../data";
+import { ActionCenterState, DesktopSettings, ExplorerState } from "../types";
+import { clamp } from "./windowGeometry";
+
+const STORAGE_KEYS = {
+  settings: "desktop-sim:settings",
+  pinnedTaskbarApps: "desktop-sim:pinned-taskbar-apps",
+  actionCenter: "desktop-sim:action-center",
+} as const;
+
+export const initialSettings: DesktopSettings = {
+  theme: "light",
+  transparency: true,
+  snapWindows: true,
+  accentIntensity: 65,
+  accentColor: accentColors[1],
+};
+
+export const initialExplorer: ExplorerState = {
+  path: "Desktop",
+  history: [],
+  future: [],
+  selectedId: null,
+};
+
+export const initialActionCenter: ActionCenterState = {
+  wifi: true,
+  bluetooth: false,
+  batterySaver: false,
+  focusAssist: false,
+  volume: 62,
+  brightness: 74,
+};
+
+function readStorageValue<T>(key: string, fallback: T, validate: (value: unknown) => T) {
+  try {
+    const rawValue = globalThis.localStorage?.getItem(key);
+
+    return rawValue ? validate(JSON.parse(rawValue)) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export function writeStorageValue(key: keyof typeof STORAGE_KEYS, value: unknown) {
+  try {
+    globalThis.localStorage?.setItem(STORAGE_KEYS[key], JSON.stringify(value));
+  } catch {
+    // Storage can be unavailable in private sessions or restricted embeds.
+  }
+}
+
+export function readStoredSettings() {
+  return readStorageValue(STORAGE_KEYS.settings, initialSettings, (value) => {
+    if (!value || typeof value !== "object") {
+      return initialSettings;
+    }
+
+    const settings = value as Partial<DesktopSettings>;
+
+    return {
+      ...initialSettings,
+      theme: settings.theme === "dark" || settings.theme === "light"
+        ? settings.theme
+        : initialSettings.theme,
+      transparency:
+        typeof settings.transparency === "boolean"
+          ? settings.transparency
+          : initialSettings.transparency,
+      snapWindows:
+        typeof settings.snapWindows === "boolean"
+          ? settings.snapWindows
+          : initialSettings.snapWindows,
+      accentIntensity:
+        typeof settings.accentIntensity === "number"
+          ? clamp(settings.accentIntensity, 0, 100)
+          : initialSettings.accentIntensity,
+      accentColor:
+        typeof settings.accentColor === "string" &&
+        accentColors.includes(settings.accentColor)
+          ? settings.accentColor
+          : initialSettings.accentColor,
+    };
+  });
+}
+
+export function readStoredPinnedApps() {
+  return readStorageValue(
+    STORAGE_KEYS.pinnedTaskbarApps,
+    apps.map((app) => app.id),
+    (value) => {
+      if (!Array.isArray(value)) {
+        return apps.map((app) => app.id);
+      }
+
+      const appIds = new Set(apps.map((app) => app.id));
+
+      return value.filter(
+        (appId): appId is string => typeof appId === "string" && appIds.has(appId),
+      );
+    },
+  );
+}
+
+export function readStoredActionCenter() {
+  return readStorageValue(STORAGE_KEYS.actionCenter, initialActionCenter, (value) => {
+    if (!value || typeof value !== "object") {
+      return initialActionCenter;
+    }
+
+    const actionCenter = value as Partial<ActionCenterState>;
+
+    return {
+      ...initialActionCenter,
+      wifi:
+        typeof actionCenter.wifi === "boolean"
+          ? actionCenter.wifi
+          : initialActionCenter.wifi,
+      bluetooth:
+        typeof actionCenter.bluetooth === "boolean"
+          ? actionCenter.bluetooth
+          : initialActionCenter.bluetooth,
+      batterySaver:
+        typeof actionCenter.batterySaver === "boolean"
+          ? actionCenter.batterySaver
+          : initialActionCenter.batterySaver,
+      focusAssist:
+        typeof actionCenter.focusAssist === "boolean"
+          ? actionCenter.focusAssist
+          : initialActionCenter.focusAssist,
+      volume:
+        typeof actionCenter.volume === "number"
+          ? clamp(actionCenter.volume, 0, 100)
+          : initialActionCenter.volume,
+      brightness:
+        typeof actionCenter.brightness === "number"
+          ? clamp(actionCenter.brightness, 20, 100)
+          : initialActionCenter.brightness,
+    };
+  });
+}
