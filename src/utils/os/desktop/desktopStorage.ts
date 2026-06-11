@@ -8,6 +8,13 @@ const STORAGE_KEYS = {
   actionCenter: "desktop-sim:action-center",
 } as const;
 
+const STORAGE_VERSION = 1;
+
+type StoredValue<T> = {
+  version: typeof STORAGE_VERSION;
+  value: T;
+};
+
 export const initialSettings: DesktopSettings = {
   theme: "light",
   transparency: true,
@@ -32,11 +39,23 @@ export const initialActionCenter: ActionCenterState = {
   brightness: 74,
 };
 
+function isStoredValue(value: unknown): value is StoredValue<unknown> {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    (value as Partial<StoredValue<unknown>>).version === STORAGE_VERSION &&
+    "value" in value
+  );
+}
+
 function readStorageValue<T>(key: string, fallback: T, validate: (value: unknown) => T) {
   try {
     const rawValue = globalThis.localStorage?.getItem(key);
+    const parsedValue = rawValue ? JSON.parse(rawValue) : null;
 
-    return rawValue ? validate(JSON.parse(rawValue)) : fallback;
+    return parsedValue
+      ? validate(isStoredValue(parsedValue) ? parsedValue.value : parsedValue)
+      : fallback;
   } catch {
     return fallback;
   }
@@ -44,7 +63,10 @@ function readStorageValue<T>(key: string, fallback: T, validate: (value: unknown
 
 export function writeStorageValue(key: keyof typeof STORAGE_KEYS, value: unknown) {
   try {
-    globalThis.localStorage?.setItem(STORAGE_KEYS[key], JSON.stringify(value));
+    globalThis.localStorage?.setItem(
+      STORAGE_KEYS[key],
+      JSON.stringify({ version: STORAGE_VERSION, value }),
+    );
   } catch {
     // Storage can be unavailable in private sessions or restricted embeds.
   }
