@@ -1,37 +1,38 @@
 import { CloudSun } from "lucide-react";
 import { FC, useEffect } from "react";
-import ActionCenter from "./components/ActionCenter";
-import ClockFlyout from "./components/ClockFlyout";
-import ContextMenu from "./components/ContextMenu";
-import DesktopIconButton from "./components/DesktopIconButton";
-import DesktopWindow from "./components/DesktopWindow";
-import StartMenu from "./components/StartMenu";
-import Taskbar from "./components/Taskbar";
+import ActionCenterPanel from "./components/os/panels/ActionCenterPanel";
+import ClockPanel from "./components/os/panels/ClockPanel";
+import ContextMenu from "./components/os/context-menu/ContextMenu";
+import DesktopIconButton from "./components/os/desktop/DesktopIconButton";
+import DesktopWindow from "./components/os/window/DesktopWindow";
+import Shell from "./components/os/shell/Shell";
+import StartPanel from "./components/os/panels/StartPanel";
 import { apps } from "./data";
-import { useDesktopController } from "./hooks/useDesktopController";
+import { useDesktopController } from "./hooks/os/desktop/useDesktopController";
+import { UI_CATEGORY } from "./utils/os/ui/uiCategories";
 
 const App: FC = () => {
   const desktop = useDesktopController();
 
   useEffect(() => {
-    const flyoutId = desktop.startOpen
+    const panelId = desktop.startPanelOpen
       ? "start-menu"
       : desktop.actionCenterOpen
         ? "action-center"
-        : desktop.clockFlyoutOpen
-          ? "clock-flyout"
+        : desktop.clockPanelOpen
+          ? "clock-panel"
           : null;
 
-    if (!flyoutId) {
+    if (!panelId) {
       return;
     }
 
     const animationFrame = window.requestAnimationFrame(() => {
-      document.getElementById(flyoutId)?.focus({ preventScroll: true });
+      document.getElementById(panelId)?.focus({ preventScroll: true });
     });
 
     return () => window.cancelAnimationFrame(animationFrame);
-  }, [desktop.actionCenterOpen, desktop.clockFlyoutOpen, desktop.startOpen]);
+  }, [desktop.actionCenterOpen, desktop.clockPanelOpen, desktop.startPanelOpen]);
 
   return (
     <main
@@ -40,24 +41,30 @@ const App: FC = () => {
           ? "desktop--transparency-on"
           : "desktop--transparency-off"
       }`}
+      data-ui-category={UI_CATEGORY.space}
       style={desktop.desktopStyle}
       onClick={() => {
         desktop.setSelectedIcon(null);
         desktop.setContextMenu(null);
-        desktop.setStartOpen(false);
+        desktop.setStartPanelOpen(false);
         desktop.setActionCenterOpen(false);
-        desktop.setClockFlyoutOpen(false);
+        desktop.setClockPanelOpen(false);
       }}
       onContextMenu={desktop.showDesktopMenu}
     >
-      <div className="desktop__wallpaper" />
-      <div className="desktop__status" aria-hidden="true">
+      <div className="desktop__wallpaper" data-ui-category={UI_CATEGORY.background} />
+      <div
+        className="desktop__status"
+        data-ui-category={UI_CATEGORY.shell}
+        aria-hidden="true"
+      >
         <CloudSun size={18} />
         <span>18 deg</span>
       </div>
       {desktop.snapPreview && (
         <div
           className="desktop__snap-preview"
+          data-ui-category={UI_CATEGORY.window}
           style={{
             left: desktop.snapPreview.x,
             top: desktop.snapPreview.y,
@@ -68,7 +75,11 @@ const App: FC = () => {
         />
       )}
 
-      <section className="desktop__icon-layer" aria-label="Desktop icons">
+      <section
+        className="desktop__icon-layer"
+        data-ui-category={UI_CATEGORY.space}
+        aria-label="Desktop icons"
+      >
         {desktop.icons.map((icon) => (
           <DesktopIconButton
             key={icon.id}
@@ -115,53 +126,53 @@ const App: FC = () => {
         />
       )}
 
-      <footer className="desktop__taskbar">
-        {desktop.startOpen && (
-          <StartMenu
+      <footer className="desktop__shell" data-ui-category={UI_CATEGORY.shell}>
+        {desktop.startPanelOpen && (
+          <StartPanel
             apps={apps}
             onOpenApp={desktop.openApp}
             onAppContextMenu={desktop.showIconMenu}
           />
         )}
-        <Taskbar
-          apps={desktop.taskbarApps}
+        <Shell
+          apps={desktop.shellApps}
           windows={desktop.windows}
           time={desktop.clock}
-          startOpen={desktop.startOpen}
-          clockFlyoutOpen={desktop.clockFlyoutOpen}
+          startPanelOpen={desktop.startPanelOpen}
+          clockPanelOpen={desktop.clockPanelOpen}
           actionCenterOpen={desktop.actionCenterOpen}
           onOpenApp={desktop.openApp}
-          onAppContextMenu={desktop.showTaskbarAppMenu}
+          onAppContextMenu={desktop.showShellAppMenu}
           onStartToggle={(event) => {
             event.stopPropagation();
-            desktop.setStartOpen((current) => !current);
+            desktop.setStartPanelOpen((current) => !current);
             desktop.setActionCenterOpen(false);
-            desktop.setClockFlyoutOpen(false);
+            desktop.setClockPanelOpen(false);
             desktop.setContextMenu(null);
           }}
           onActionCenterToggle={(event) => {
             event.stopPropagation();
-            desktop.setStartOpen(false);
-            desktop.setClockFlyoutOpen(false);
+            desktop.setStartPanelOpen(false);
+            desktop.setClockPanelOpen(false);
             desktop.setActionCenterOpen((current) => !current);
           }}
           onClockToggle={(event) => {
             event.stopPropagation();
-            desktop.setStartOpen(false);
+            desktop.setStartPanelOpen(false);
             desktop.setActionCenterOpen(false);
-            desktop.setClockFlyoutOpen((current) => !current);
+            desktop.setClockPanelOpen((current) => !current);
           }}
         >
           {desktop.actionCenterOpen && (
-            <ActionCenter
+            <ActionCenterPanel
               state={desktop.actionCenter}
               onChange={desktop.setActionCenter}
               onClose={() => desktop.setActionCenterOpen(false)}
               onPower={desktop.resetDesktop}
             />
           )}
-          {desktop.clockFlyoutOpen && <ClockFlyout date={desktop.clockDate} />}
-        </Taskbar>
+          {desktop.clockPanelOpen && <ClockPanel date={desktop.clockDate} />}
+        </Shell>
       </footer>
     </main>
   );

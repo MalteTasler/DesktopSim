@@ -1,5 +1,5 @@
 import { DesktopApp, DesktopIcon, ExplorerItem, WebAppDefinition } from "./types";
-import { layoutDesktopIcons } from "./utils/layoutDesktopIcons";
+import { layoutDesktopIcons } from "./utils/os/desktop/layoutDesktopIcons";
 
 export const accentColors = ["#2563eb", "#0f766e", "#a16207", "#be123c"];
 

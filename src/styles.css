@@ -1,18 +1,18 @@
 :root {
-  --taskbar-height: 48px;
-  --flyout-gap: 8px;
-  --flyout-bottom: calc(var(--taskbar-height) + var(--flyout-gap));
-  --surface-flyout: rgba(248, 250, 252, 0.97);
-  --surface-flyout-solid: #f8fafc;
-  --surface-flyout-dark: rgba(15, 23, 42, 0.97);
-  --surface-flyout-dark-solid: #111827;
-  --border-flyout: rgba(255, 255, 255, 0.22);
-  --border-flyout-dark: rgba(226, 232, 240, 0.14);
-  --shadow-flyout: 0 24px 70px rgba(0, 0, 0, 0.42);
-  --radius-flyout: 8px;
+  --shell-height: 48px;
+  --panel-gap: 8px;
+  --panel-bottom: calc(var(--shell-height) + var(--panel-gap));
+  --surface-panel: rgba(248, 250, 252, 0.97);
+  --surface-panel-solid: #f8fafc;
+  --surface-panel-dark: rgba(15, 23, 42, 0.97);
+  --surface-panel-dark-solid: #111827;
+  --border-panel: rgba(255, 255, 255, 0.22);
+  --border-panel-dark: rgba(226, 232, 240, 0.14);
+  --shadow-panel: 0 24px 70px rgba(0, 0, 0, 0.42);
+  --radius-panel: 8px;
   --radius-control: 7px;
   --radius-compact: 5px;
-  --spacing-flyout: 14px;
+  --spacing-panel: 14px;
   --motion-fast: 160ms;
   --motion-standard: 220ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -77,7 +77,7 @@ button {
 
 .desktop__icon-layer {
   position: absolute;
-  inset: 0 0 var(--taskbar-height);
+  inset: 0 0 var(--shell-height);
 }
 
 .desktop__status {
@@ -159,7 +159,7 @@ button {
 
 .desktop--transparency-off .window,
 .desktop--transparency-off .context-menu,
-.desktop--transparency-off .taskbar-flyout {
+.desktop--transparency-off .panel {
   background: #f8fafc;
 }
 
@@ -171,7 +171,7 @@ button {
 
 .desktop--dark.desktop--transparency-off .window,
 .desktop--dark.desktop--transparency-off .context-menu,
-.desktop--dark.desktop--transparency-off .taskbar-flyout {
+.desktop--dark.desktop--transparency-off .panel {
   background: #111827;
 }
 
@@ -222,8 +222,8 @@ button {
 }
 
 .window__actions button,
-.desktop__taskbar button,
-.taskbar__search-box {
+.desktop__shell button,
+.shell__search-box {
   display: grid;
   place-items: center;
   border: 0;
@@ -235,7 +235,7 @@ button {
 }
 
 .window__actions button:focus-visible,
-.desktop__taskbar button:focus-visible,
+.desktop__shell button:focus-visible,
 .context-menu button:focus-visible,
 .start-menu button:focus-visible,
 .desktop-icon:focus-visible {
@@ -925,7 +925,7 @@ button {
   background: var(--accent-soft);
 }
 
-.desktop__taskbar {
+.desktop__shell {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -934,7 +934,7 @@ button {
   display: grid;
   grid-template-columns: 52px minmax(160px, 240px) 1fr auto;
   align-items: center;
-  height: var(--taskbar-height);
+  height: var(--shell-height);
   gap: 8px;
   padding: 0 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.18);
@@ -942,57 +942,57 @@ button {
   backdrop-filter: blur(22px);
 }
 
-.desktop--transparency-off .desktop__taskbar,
+.desktop--transparency-off .desktop__shell,
 .desktop--transparency-off .desktop__status {
   background: #172033;
   backdrop-filter: none;
 }
 
-.desktop--dark .desktop__taskbar {
+.desktop--dark .desktop__shell {
   background: rgba(3, 7, 18, 0.86);
 }
 
-.taskbar-flyout {
+.panel {
   position: absolute;
-  bottom: var(--flyout-bottom);
+  bottom: var(--panel-bottom);
   overflow: auto;
   border: 1px solid rgba(255, 255, 255, 0.22);
-  border-color: var(--border-flyout);
-  border-radius: var(--radius-flyout);
-  background: var(--surface-flyout);
-  box-shadow: var(--shadow-flyout);
+  border-color: var(--border-panel);
+  border-radius: var(--radius-panel);
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-panel);
   color: #0f172a;
-  animation: flyout-enter var(--motion-standard) var(--ease-standard);
+  animation: panel-enter var(--motion-standard) var(--ease-standard);
   transform-origin: bottom center;
 }
 
-.taskbar-flyout:focus-visible {
+.panel:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent-color), #ffffff 24%);
   outline-offset: 2px;
 }
 
-.taskbar-flyout button {
+.panel button {
   transition:
     background-color var(--motion-fast) var(--ease-standard),
     border-color var(--motion-fast) var(--ease-standard),
     color var(--motion-fast) var(--ease-standard);
 }
 
-.desktop--dark .taskbar-flyout {
-  border-color: var(--border-flyout-dark);
-  background: var(--surface-flyout-dark);
+.desktop--dark .panel {
+  border-color: var(--border-panel-dark);
+  background: var(--surface-panel-dark);
   color: #e5edf7;
 }
 
-.desktop--transparency-off .taskbar-flyout {
-  background: var(--surface-flyout-solid);
+.desktop--transparency-off .panel {
+  background: var(--surface-panel-solid);
 }
 
-.desktop--dark.desktop--transparency-off .taskbar-flyout {
-  background: var(--surface-flyout-dark-solid);
+.desktop--dark.desktop--transparency-off .panel {
+  background: var(--surface-panel-dark-solid);
 }
 
-@keyframes flyout-enter {
+@keyframes panel-enter {
   from {
     opacity: 0;
     transform: translateY(6px) scale(0.98);
@@ -1005,11 +1005,11 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .taskbar-flyout {
+  .panel {
     animation: none;
   }
 
-  .taskbar-flyout button {
+  .panel button {
     transition: none;
   }
 }
@@ -1017,7 +1017,7 @@ button {
 .start-menu {
   left: 10px;
   width: min(360px, calc(100vw - 20px));
-  max-height: calc(100vh - var(--flyout-bottom) - 16px);
+  max-height: calc(100vh - var(--panel-bottom) - 16px);
 }
 
 .start-menu > div {
@@ -1075,20 +1075,20 @@ button {
   background: var(--accent-soft);
 }
 
-.taskbar__start-button,
-.taskbar__apps button {
+.shell__start-button,
+.shell__apps button {
   width: 38px;
   height: 38px;
   border-radius: var(--radius-compact);
 }
 
-.taskbar__start-button:hover,
-.taskbar__apps button:hover,
-.taskbar__apps button.taskbar__app--running {
+.shell__start-button:hover,
+.shell__apps button:hover,
+.shell__apps button.shell__app--running {
   background: var(--accent-strong);
 }
 
-.taskbar__search-box {
+.shell__search-box {
   grid-template-columns: 22px 1fr;
   height: 34px;
   justify-items: start;
@@ -1099,11 +1099,11 @@ button {
   font-size: 13px;
 }
 
-.desktop--transparency-off .taskbar__search-box {
+.desktop--transparency-off .shell__search-box {
   background: #263247;
 }
 
-.taskbar__apps {
+.shell__apps {
   display: flex;
   align-items: center;
   min-width: 0;
@@ -1112,11 +1112,11 @@ button {
   scrollbar-width: none;
 }
 
-.taskbar__apps::-webkit-scrollbar {
+.shell__apps::-webkit-scrollbar {
   display: none;
 }
 
-.taskbar__system-tray {
+.shell__system-tray {
   position: relative;
   display: flex;
   align-items: center;
@@ -1127,16 +1127,16 @@ button {
   font-size: 12px;
 }
 
-.taskbar__system-tray button {
+.shell__system-tray button {
   height: 30px;
   border-radius: var(--radius-compact);
 }
 
-.taskbar__system-tray button:hover {
+.shell__system-tray button:hover {
   background: var(--accent-strong);
 }
 
-.taskbar__tray-status-button {
+.shell__tray-status-button {
   display: grid;
   grid-template-columns: repeat(3, 16px);
   width: 70px;
@@ -1146,7 +1146,7 @@ button {
   padding: 0 7px;
 }
 
-.taskbar__clock-button {
+.shell__clock-button {
   min-width: 48px;
   padding: 0 8px;
   color: inherit;
@@ -1157,36 +1157,36 @@ button {
   right: 0;
   display: grid;
   width: min(360px, calc(100vw - 20px));
-  max-height: calc(100vh - var(--flyout-bottom) - 16px);
+  max-height: calc(100vh - var(--panel-bottom) - 16px);
   gap: 14px;
-  padding: var(--spacing-flyout);
+  padding: var(--spacing-panel);
   transform-origin: bottom right;
 }
 
-.clock-flyout {
+.clock-panel {
   right: 0;
   display: grid;
   width: min(344px, calc(100vw - 20px));
-  max-height: calc(100vh - var(--flyout-bottom) - 16px);
+  max-height: calc(100vh - var(--panel-bottom) - 16px);
   gap: 10px;
   padding: 12px;
   transform-origin: bottom right;
 }
 
-.clock-flyout__time-card,
-.clock-flyout__calendar-card {
+.clock-panel__time-card,
+.clock-panel__calendar-card {
   border: 1px solid #dbe3ee;
   border-radius: var(--radius-control);
   background: #f1f5f9;
 }
 
-.desktop--dark .clock-flyout__time-card,
-.desktop--dark .clock-flyout__calendar-card {
+.desktop--dark .clock-panel__time-card,
+.desktop--dark .clock-panel__calendar-card {
   border-color: rgba(226, 232, 240, 0.14);
   background: #1e293b;
 }
 
-.clock-flyout__time-card {
+.clock-panel__time-card {
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr);
   align-items: center;
@@ -1194,39 +1194,39 @@ button {
   padding: 12px;
 }
 
-.clock-flyout__time-card svg {
+.clock-panel__time-card svg {
   color: var(--accent-color);
 }
 
-.clock-flyout__time-card div {
+.clock-panel__time-card div {
   display: grid;
   min-width: 0;
   gap: 2px;
 }
 
-.clock-flyout__time-card span,
-.clock-flyout__time-card small {
+.clock-panel__time-card span,
+.clock-panel__time-card small {
   color: #64748b;
   font-size: 12px;
 }
 
-.desktop--dark .clock-flyout__time-card span,
-.desktop--dark .clock-flyout__time-card small {
+.desktop--dark .clock-panel__time-card span,
+.desktop--dark .clock-panel__time-card small {
   color: #94a3b8;
 }
 
-.clock-flyout__time-card strong {
+.clock-panel__time-card strong {
   font-size: 30px;
   line-height: 1.1;
 }
 
-.clock-flyout__calendar-card {
+.clock-panel__calendar-card {
   display: grid;
   gap: 10px;
   padding: 12px;
 }
 
-.clock-flyout__calendar-header {
+.clock-panel__calendar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1234,56 +1234,56 @@ button {
   font-size: 14px;
 }
 
-.clock-flyout__calendar-header > div {
+.clock-panel__calendar-header > div {
   display: flex;
   align-items: center;
   min-width: 0;
   gap: 8px;
 }
 
-.clock-flyout__calendar-header svg {
+.clock-panel__calendar-header svg {
   color: #0f766e;
 }
 
-.clock-flyout__calendar-header strong {
+.clock-panel__calendar-header strong {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.clock-flyout__month-controls {
+.clock-panel__month-controls {
   flex: 0 0 auto;
 }
 
-.clock-flyout__month-controls button {
+.clock-panel__month-controls button {
   width: 28px;
   height: 28px;
   color: inherit;
 }
 
-.clock-flyout__month-controls button:hover {
+.clock-panel__month-controls button:hover {
   background: var(--accent-soft);
 }
 
-.clock-flyout__weekdays,
-.clock-flyout__calendar-grid {
+.clock-panel__weekdays,
+.clock-panel__calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 4px;
   text-align: center;
 }
 
-.clock-flyout__weekdays {
+.clock-panel__weekdays {
   color: #64748b;
   font-size: 11px;
   font-weight: 600;
 }
 
-.desktop--dark .clock-flyout__weekdays {
+.desktop--dark .clock-panel__weekdays {
   color: #94a3b8;
 }
 
-.clock-flyout__calendar-grid button {
+.clock-panel__calendar-grid button {
   display: grid;
   aspect-ratio: 1;
   min-width: 0;
@@ -1295,35 +1295,35 @@ button {
   font-size: 12px;
 }
 
-.clock-flyout__calendar-grid button:hover {
+.clock-panel__calendar-grid button:hover {
   border-color: #cbd5e1;
   background: rgba(226, 232, 240, 0.72);
 }
 
-.desktop--dark .clock-flyout__calendar-grid button:hover {
+.desktop--dark .clock-panel__calendar-grid button:hover {
   border-color: rgba(226, 232, 240, 0.18);
   background: rgba(51, 65, 85, 0.82);
 }
 
-.clock-flyout__day--muted {
+.clock-panel__day--muted {
   color: #94a3b8 !important;
 }
 
-.desktop--dark .clock-flyout__day--muted {
+.desktop--dark .clock-panel__day--muted {
   color: #64748b !important;
 }
 
-.clock-flyout__day--selected {
+.clock-panel__day--selected {
   border-color: var(--accent-color) !important;
   background: var(--accent-soft) !important;
   color: #0f172a !important;
 }
 
-.desktop--dark .clock-flyout__day--selected {
+.desktop--dark .clock-panel__day--selected {
   color: #e5edf7 !important;
 }
 
-.clock-flyout__day--today {
+.clock-panel__day--today {
   border-color: transparent !important;
   background: var(--accent-color) !important;
   color: #ffffff !important;
@@ -1456,11 +1456,11 @@ button {
 }
 
 @media (max-width: 720px) {
-  .desktop__taskbar {
+  .desktop__shell {
     grid-template-columns: 48px 1fr auto;
   }
 
-  .taskbar__search-box {
+  .shell__search-box {
     display: none;
   }
 
@@ -1473,19 +1473,19 @@ button {
     display: none;
   }
 
-  .taskbar__system-tray {
+  .shell__system-tray {
     min-width: 108px;
   }
 
-  .taskbar__tray-status-button {
+  .shell__tray-status-button {
     width: 66px;
     padding: 0 5px;
   }
 
   .action-center,
-  .clock-flyout {
+  .clock-panel {
     right: -6px;
-    bottom: var(--flyout-bottom);
+    bottom: var(--panel-bottom);
   }
 
   .explorer-pane {
