@@ -942,10 +942,20 @@ button {
   backdrop-filter: blur(22px);
 }
 
+.desktop--light .desktop__shell {
+  border-top-color: rgba(255, 255, 255, 0.52);
+  background: rgba(218, 226, 236, 0.8);
+  color: #1e293b;
+}
+
 .desktop--transparency-off .desktop__shell,
 .desktop--transparency-off .desktop__status {
   background: #172033;
   backdrop-filter: none;
+}
+
+.desktop--light.desktop--transparency-off .desktop__shell {
+  background: #d8e0eb;
 }
 
 .desktop--dark .desktop__shell {
@@ -1099,8 +1109,17 @@ button {
   font-size: 13px;
 }
 
+.desktop--light .shell__search-box {
+  background: rgba(255, 255, 255, 0.42);
+  color: #334155;
+}
+
 .desktop--transparency-off .shell__search-box {
   background: #263247;
+}
+
+.desktop--light.desktop--transparency-off .shell__search-box {
+  background: #e2e8f0;
 }
 
 .shell__apps {
