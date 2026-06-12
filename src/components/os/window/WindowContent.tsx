@@ -1,5 +1,6 @@
 import { Dispatch, FC, SetStateAction } from "react";
 import { getAppDefinition } from "../../../apps/appRegistry";
+import BrowserPane from "../../apps/BrowserPane";
 import SettingsPane from "../../apps/SettingsPane";
 import {
   DesktopSettings,
@@ -26,6 +27,10 @@ const WindowContent: FC<WindowContentProps> = ({ window, ...services }) => {
   const app = getAppDefinition(window.appId);
 
   if (!app) {
+    if (window.kind === "web" && window.url) {
+      return <BrowserPane fixedTitle={window.title} fixedUrl={window.url} />;
+    }
+
     return (
       <SettingsPane
         settings={services.settings}

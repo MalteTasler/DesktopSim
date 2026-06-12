@@ -1,9 +1,9 @@
-import { CloudSun } from "lucide-react";
 import { FC, useEffect } from "react";
 import ActionPanel from "./components/os/panels/ActionPanel";
 import TimePanel from "./components/os/panels/TimePanel";
 import ContextMenu from "./components/os/context-menu/ContextMenu";
 import DesktopIconButton from "./components/os/desktop/DesktopIconButton";
+import DesktopWeatherStatus from "./components/os/desktop/DesktopWeatherStatus";
 import DesktopWindow from "./components/os/window/DesktopWindow";
 import Shell from "./components/os/shell/Shell";
 import StartPanel from "./components/os/panels/StartPanel";
@@ -51,14 +51,7 @@ const App: FC = () => {
       onContextMenu={desktop.showDesktopMenu}
     >
       <div className="desktop__wallpaper" data-ui-category={UI_CATEGORY.background} />
-      <div
-        className="desktop__status"
-        data-ui-category={UI_CATEGORY.shell}
-        aria-hidden="true"
-      >
-        <CloudSun size={18} />
-        <span>18 deg</span>
-      </div>
+      <DesktopWeatherStatus onOpenWeather={desktop.openWeather} />
       {desktop.snapPreview && (
         <div
           className="desktop__snap-preview"

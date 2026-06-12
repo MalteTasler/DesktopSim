@@ -50,6 +50,25 @@ export function useWindowManager({
     onNewWindowOpen();
   }
 
+  function openUrl(app: AppDefinition) {
+    const existing = windows.find((windowState) => windowState.appId === app.id);
+
+    if (existing) {
+      stacking.focusWindow(existing.windowId);
+      setWindows((current) =>
+        restoreWindow(current, existing.windowId).map((windowState) =>
+          windowState.windowId === existing.windowId
+            ? { ...windowState, title: app.title, url: app.url }
+            : windowState,
+        ),
+      );
+      onNewWindowOpen();
+      return;
+    }
+
+    openApp(app);
+  }
+
   function closeWindow(windowId: string) {
     setWindows((current) =>
       current.filter((windowState) => windowState.windowId !== windowId),
@@ -93,6 +112,7 @@ export function useWindowManager({
     focusWindow: stacking.focusWindow,
     minimizeWindow,
     openApp,
+    openUrl,
     resizeWindow: createResizeWindowHandler({
       focusWindow: stacking.focusWindow,
       setSnapPreview,

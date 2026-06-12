@@ -15,6 +15,7 @@ import {
   getViewportSize,
   layoutDesktopIcons,
 } from "../../../utils/os/desktop/layoutDesktopIcons";
+import { createWeatherWindowApp } from "../../../utils/os/desktop/weatherWindow";
 import { fitBoundsToWorkArea, getWorkArea } from "../../../utils/os/window/windowGeometry";
 
 export function useDesktopController() {
@@ -131,6 +132,10 @@ export function useDesktopController() {
     }
   }
 
+  function openWeather(url: string) {
+    windows.openUrl(createWeatherWindowApp(apps, url));
+  }
+
   return {
     actionCenter: persistent.actionCenter,
     actionCenterOpen: panels.actionCenterOpen,
@@ -162,6 +167,7 @@ export function useDesktopController() {
     minimizeWindow: windows.minimizeWindow,
     openApp: windows.openApp,
     openDesktopShortcut,
+    openWeather,
     openExplorerItem: explorer.openExplorerItem,
     selectDesktopIcon: icons.selectDesktopIcon,
     selectExplorerItem: explorer.selectExplorerItem,
